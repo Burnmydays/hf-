@@ -1,50 +1,59 @@
-# Using Codex on this repo
+# Codex handoff — MO§ES SigRank
 
-You (Luthen) may have OpenAI Codex access. This file is both your instructions
-for driving Codex against this repo AND the thing that earns the **Codex $10k
-sponsor prize** (which requires Codex-attributed commits in the repo/Space).
+Read this first. It's the instruction set for driving **OpenAI Codex** against this
+repo and the thing that earns the **Codex $10k sponsor prize**.
 
-## Why Codex matters for the prize
-The sponsor track rewards repos where Codex did real work, shown through
-Codex-attributed commits. So: let Codex make actual edits and commit them with
-its own attribution. Don't hand-copy its output — let it write to disk and commit.
+Local path (desktop storage): `/Users/dericmchenry/Desktop/moses-sigrank`
+GitHub (current): `github.com/Burnmydays/hf-`  →  upload target: `github.com/SunrisesIllNeverSee`
 
-## Setup
-1. Install Codex CLI (if not already): follow OpenAI's current install docs.
-2. From the repo root:  `cd ~/moses-sigrank`
-3. Point Codex at this folder so it has full file context.
+## How the prize works (important)
+The sponsor track rewards repos where **Codex did real work**, shown through
+**Codex-attributed commits**. It does NOT require that 100% of the repo is Codex's.
+Two rules:
+1. **Genuine work only.** Let Codex actually write the code and commit it with its own
+   attribution. Do not hand-copy output or fake attribution — that risks disqualification.
+2. **Verify the official rule** on the hackathon page before relying on this.
 
-## Good first tasks to hand Codex (each = one attributed commit)
-These are real, useful, and low-risk — perfect for generating genuine commits:
+## Current state (as of this handoff)
+Done and pushed to Burnmydays/hf- (main):
+- Codex parser fixed — `_codex_input_estimate` in `ingest.py` (Beta = output × real Claude
+  io_ratio; Alpha = output × 2.0 AA baseline). Two pathways, both flagged `*` estimated.
+- `./sigrank --all` (run every provider in turn).
+- Instructions sharpened (app.py "Clock Your Signal" tab + README).
+- Wild corpus = 10 tokscale.ai operators; board = 11 rows; Supabase migrated + synced.
 
-1. **Refine the 2:1 anchor** (`ingest.py` → `parse_codex`)
-   Current: `est_fresh_input = 2 * output`. Ask Codex to implement the
-   turn-delta method as an optional, more-accurate path (estimate cache_create
-   from per-turn input deltas when daily/session granularity is present), keeping
-   the 2:1 floor as fallback. Keep the caveat flags.
+## Tasks for Codex (each = one attributed commit)
+1. **Turn-delta Codex parser** — the headline Codex-token-parsing work. The current
+   estimate (`_codex_input_estimate` in `ingest.py`) is a single ratio applied to total
+   output. Make it more accurate: when the Codex JSON has **daily/session granularity**,
+   estimate `cache_create` from **per-day context growth** (each day's input above the
+   prior day's floor ≈ new cache writes) instead of one flat ratio. Keep the ratio path
+   (Alpha 2:1 / Beta Claude-ratio) as the fallback when only totals are present, and keep
+   the `*` estimated flag + caveat naming the method used. This is real parsing work on
+   Codex's own token data — the natural Codex-attributed commit.
+2. **`test_metrics.py`** — pytest that locks the canonical numbers and identities:
+   - MO§ES Υ = 18,436.98, leverage = 2042.2, 10x DEV = 3.31.
+   - Telescoping identity `(o/i)·(cw/o)·(cr/cw) == cr/i` for every SEED operator with cache.
+   - Both Codex pathways: Alpha `output×2`, Beta `output×io_ratio`.
+3. **Real Codex `$/1M`** — wire OpenAI per-1M prices into `parse_codex_submission` meta so
+   Codex rows can show real (not list-estimate) cost. Keep the `*` estimated flag on input.
+4. **Upload the repo to `github.com/SunrisesIllNeverSee`** (the prize-submission location).
 
-2. **Add unit tests** (`test_metrics.py`)
-   Ask Codex to write pytest cases that lock the canonical numbers:
-   MO§ES Υ=18,437, leverage=2042, 10x DEV=3.31, telescoping identity
-   (o/i)(cw/o)(cr/cw) == cr/i for every SEED operator.
-
-3. **Self-cost for Codex rows**
-   ccusage supplies cost for Claude. For Codex JSON, wire OpenAI per-1M prices
-   into `parse_codex` meta so Codex rows show real (not list-estimate) $/1M.
-
-4. **Board polish** — a small visual marker (asterisk / dimmed row) on estimated
-   rows so the leaderboard itself shows measured vs estimated at a glance.
-
-## Verifying Codex's work before commit
-After Codex edits, ALWAYS run the stress test (see TODO.md "verify" block):
+## Verify BEFORE every Codex commit
 ```
-cd ~/moses-sigrank && python3 -c "import py_compile,glob; [py_compile.compile(f,doraise=True) for f in glob.glob('*.py')]"
-python3 metrics.py    # canonical numbers must still print
+cd /Users/dericmchenry/Desktop/moses-sigrank
+.venv/bin/python -c "import py_compile,glob; [py_compile.compile(f,doraise=True) for f in glob.glob('*.py')]"
+.venv/bin/python metrics.py    # MO§ES must print Y 18436.98, lev 2042.2, 10xDEV 3.31, $/1M 0.527
 ```
-Then commit with Codex attribution.
+(use `python3` if there's no `.venv`.)
 
 ## DO NOT let Codex touch
-- The canonical SEED numbers in `metrics.py` (frozen, verified this session).
+- The MO§ES (ccusage) SEED row in `metrics.py` (canonical, Υ 18436.98).
 - The Υ formula `(C·O)/I²` or the telescoping identity — these are the thesis.
-- Anything that turns the 2:1 anchor into a silent strict assumption (it must
-  stay flagged/provisional).
+- The Codex estimation must stay **flagged (`*`)** — never a silent strict assumption.
+
+## Already done — NOT available as Codex commits
+- 2:1 → real-ratio anchor refinement (Alpha/Beta unified). Done by Claude this session.
+- Board `~`/`*` estimated-row marker. Done by Claude this session.
+
+See `SCRATCHPAD.md` for live cross-agent state and `TODO.md` for the full task board.
