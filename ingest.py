@@ -251,66 +251,93 @@ def ingest_meta(text, operator_profile=None):
       - Text with named fields (extracts by field name, not position)
       - Four bare numbers: input output cache_create cache_read
 
+    Reinforced error handling guarantees that malformed JSON strings, trailing
+    spaces, or mixed terminal logs fall back safely through non-breaking pipeline
+    routes.
+
     operator_profile: optional dict {"model_type": "claude", "io_ratio": float}
     when the submitting user has a verified Claude session profile. This
     switches the Codex parser from the Alpha 2:1 baseline to the Beta pathway
     that uses the operator's own Claude input/output ratio.
     """
-    text=text.strip()
-    if not text: raise ValueError("empty")
+    text = text.strip()
+    if not text:
+        raise ValueError("The sequence input buffer is empty.")
+
+    # Defense 1: Pre-process and strip common terminal markdown code block wrappers
+    if text.startswith("```"):
+        text = re.sub(r"^```[a-z]*\n", "", text, flags=re.IGNORECASE)
+        text = re.sub(r"\n```$", "", text)
+        text = text.strip()
+
+    # Defense 2: Seek embedded object markers if raw copy contains surrounding prose
+    fixed = None
+    json_start = re.search(r'[\{\["]', text)
+    if json_start:
+        candidate_segment = text[json_start.start():]
+        fixed = _try_fix_json(candidate_segment)
+
+    if not fixed and text[0] in '{["':
+        fixed = _try_fix_json(text)
 
     # --- Strategy 1: Try to parse as valid JSON (or fix partial JSON) ---
-    fixed = None
-    if text[0] in '{["':
-        fixed = _try_fix_json(text)
     if fixed:
-        d = json.loads(fixed)
-        if is_codex_shape(d):
-            return parse_codex_submission(d, operator_profile=operator_profile)
-        i,o,cw,cr,cost = parse_ccusage(fixed)
-        return i,o,cw,cr,{"source":"ccusage","estimated":False,"caveat":None,"cost":cost}
+        try:
+            d = json.loads(fixed)
+            if is_codex_shape(d):
+                return parse_codex_submission(d, operator_profile=operator_profile)
+            i, o, cw, cr, cost = parse_ccusage(fixed)
+            return i, o, cw, cr, {"source": "ccusage", "estimated": False, "caveat": None, "cost": cost}
+        except Exception:
+            pass  # Fall through to named-field extraction if the tree remains broken
 
     # --- Strategy 2: Text has named fields — extract by name ---
     if _has_named_fields(text):
-        result = _extract_by_name(text)
-        if result:
-            i, o, cw, cr, cost_val = result
-            has_codex_fields = any(
-                alias in text
-                for alias in ("cachedInputTokens", "cached_input_tokens",
-                              "reasoningOutputTokens", "reasoning_output_tokens")
-            )
-            if has_codex_fields:
-                # Re-route through Codex pathway with extracted totals
-                raw_cache = 0
-                for alias in _FIELD_ALIASES["cache_read"]:
-                    m = re.search(rf'"{re.escape(alias)}"\s*:\s*([\d,.]+)', text)
-                    if m:
-                        raw_cache = int(float(m.group(1).replace(",", "")))
-                        break
-                raw_in = 0
-                for alias in _FIELD_ALIASES["input"]:
-                    m = re.search(rf'"{re.escape(alias)}"\s*:\s*([\d,.]+)', text)
-                    if m:
-                        raw_in = int(float(m.group(1).replace(",", "")))
-                        break
-                raw_out = o  # already includes reasoning from _extract_by_name
-                est_input, parsing_mode = _codex_input_estimate(raw_out, operator_profile)
-                context_debt = max(0, raw_in - est_input)
-                meta = {
-                    "source": "codex", "estimated": True,
-                    "parsing_mode": parsing_mode,
-                    "caveat": f"* {parsing_mode}",
-                    "anchor": parsing_mode, "cost": cost_val,
-                }
-                return int(est_input), raw_out, context_debt, raw_cache, meta
-            else:
-                cost = cost_val if cost_val and cost_val > 0 else None
-                return i, o, cw, cr, {
-                    "source": "ccusage", "estimated": False,
-                    "caveat": None, "cost": cost,
-                }
+        try:
+            result = _extract_by_name(text)
+            if result:
+                i, o, cw, cr, cost_val = result
+                has_codex_fields = any(
+                    alias in text
+                    for alias in ("cachedInputTokens", "cached_input_tokens",
+                                  "reasoningOutputTokens", "reasoning_output_tokens")
+                )
+                if has_codex_fields:
+                    # Re-route through Codex pathway with extracted totals
+                    raw_cache = 0
+                    for alias in _FIELD_ALIASES["cache_read"]:
+                        m = re.search(rf'"{re.escape(alias)}"\s*:\s*([\d,.]+)', text)
+                        if m:
+                            raw_cache = int(float(m.group(1).replace(",", "")))
+                            break
+                    raw_in = 0
+                    for alias in _FIELD_ALIASES["input"]:
+                        m = re.search(rf'"{re.escape(alias)}"\s*:\s*([\d,.]+)', text)
+                        if m:
+                            raw_in = int(float(m.group(1).replace(",", "")))
+                            break
+                    raw_out = o  # already includes reasoning from _extract_by_name
+                    est_input, parsing_mode = _codex_input_estimate(raw_out, operator_profile)
+                    context_debt = max(0, raw_in - est_input)
+                    meta = {
+                        "source": "codex", "estimated": True,
+                        "parsing_mode": parsing_mode,
+                        "caveat": f"* {parsing_mode}",
+                        "anchor": parsing_mode, "cost": cost_val,
+                    }
+                    return int(est_input), raw_out, context_debt, raw_cache, meta
+                else:
+                    cost = cost_val if cost_val and cost_val > 0 else None
+                    return i, o, cw, cr, {
+                        "source": "ccusage", "estimated": False,
+                        "caveat": None, "cost": cost,
+                    }
+        except Exception:
+            pass
 
     # --- Strategy 3: Four bare numbers ---
-    i,o,cw,cr = parse_four(text)
-    return i,o,cw,cr,{"source":"manual","estimated":False,"caveat":None,"cost":None}
+    try:
+        i, o, cw, cr = parse_four(text)
+        return i, o, cw, cr, {"source": "manual", "estimated": False, "caveat": None, "cost": None}
+    except Exception as e:
+        raise ValueError(f"Telemetry format unrecognized. Trace error: {str(e)}")

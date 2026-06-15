@@ -69,11 +69,11 @@ def board_html(extra=None, sort_key="yield"):
         rank_cls = f"mb-rank-{i}" if i <= 3 else ""
         rkey = rarity_class(m)[0]
         if you:
-            cls = f"mb-row rarity-{rkey} you"
+            cls = f"mb-row species-{rkey} you"
         elif i == 1:
-            cls = f"mb-row rarity-{rkey} rank1"
+            cls = f"mb-row species-{rkey} rank1"
         else:
-            cls = f"mb-row rarity-{rkey}"
+            cls = f"mb-row species-{rkey}"
         ne = _html.escape(n)
         est_mark = " <span class='mb-est' title='* structural estimation'>*</span>" if m.get("cost_estimated") else ""
         out.append(f'<div class="{cls}">'
@@ -95,36 +95,35 @@ def board_html(extra=None, sort_key="yield"):
 def classify(m):
     if m["non_compounding"]: return "Non-Compounding \u00b7 stateless pipe"
     v,l=m["velocity"],m["leverage"]
-    if v>=1 and l>=100: return "Closed-Loop Kinetic \u00b7 holds both axes"
-    if l>=10 and v<1:   return "Archival Sponge \u00b7 high reuse, low generation"
-    if v>=0.8 and l<2:  return "Volatile Ingestor \u00b7 generates, doesn't retain"
-    return "Transient \u00b7 low on both axes"
+    if v>=1 and l>=100: return "Cascade Matrix \u00b7 recursive processing loop"
+    if l>=10 and v<1:   return "Cache Architect \u00b7 high structural reuse"
+    if v>=0.5 and l<2:  return "Converter Loop \u00b7 single-pass processing velocity"
+    return "Throughput Pipe \u00b7 raw metric bandwidth"
 
 def rarity_class(m):
-    """Returns (rarity_key, label, passive, effect).
-    MYTHIC > EPIC > RARE > COMMON based on velocity/leverage axes.
-    Mirrors the user's trading-card design: four species of greatness.
+    """Returns (species_key, label, trait, description).
+    Quadrant Species Designation based on algorithmic efficiency vectors.
     """
     v, l = m["velocity"], m["leverage"]
     if v >= 1 and l >= 100:
-        return ("mythic", "MYTHIC",
-                "Compound Interest",
-                "Multipliers stack. Transmission \u00d7 Commitment \u00d7 Reuse = Leverage. "
-                "The rare operator the leverage/generation tradeoff says shouldn\u2019t exist.")
+        return ("cascade", "CASCADE SPECIES",
+                "Compound Cascading Loop",
+                "Multipliers stack across all dimensions. Transmission \u00d7 Commitment \u00d7 Reuse = Leverage. "
+                "Maintains high production velocity while driving compounding architectural feedback.")
     if l >= 10 and v < 1:
-        return ("epic", "EPIC",
-                "Persistent Memory",
-                "Builds reusable structures. Each cache write is read many times. "
-                "Holds context beautifully \u2014 the architecture compounds without the velocity.")
+        return ("architect", "CACHE ARCHITECT",
+                "Persistent Context Layer",
+                "Builds high-reuse caching layers. Every token commit is read across sequential loops. "
+                "Holds state perfectly without requiring linear transformation velocity.")
     if v >= 0.5:
-        return ("rare", "RARE",
-                "Direct Production",
-                "Strong input-to-output conversion. Fast on single shots. "
-                "Memory doesn\u2019t persist into a compounding loop.")
-    return ("common", "COMMON",
-            "Mass Transit",
-            "Moves enormous token mass. Volume is the strategy. "
-            "Amplification is not the goal \u2014 scale is.")
+        return ("converter", "CONVERTER SPECIES",
+                "Linear Volumetric Output",
+                "High immediate input-to-output context conversion ratio. Maximizes localized turn processing. "
+                "Token footprint does not compound or recur inside long-term retrieval networks.")
+    return ("throughput", "THROUGHPUT SPECIES",
+            "Volumetric Mass Transit",
+            "Processes massive raw token scale across standard pipelines. Focuses on total platform load. "
+            "Optimization vector is execution bandwidth rather than persistent feedback loops.")
 
 def comp_bar_html(c):
     return (f'<div class="comp-bar">'
@@ -166,9 +165,9 @@ def card_html(name, m, rank, total_ops, narration_text):
         cascade = '<div class="sig-card-cascade-box">\u2014<small>non-compounding</small></div>'
     quote = _first_sentence(narration_text)
     return (
-        f'<div class="sig-card rarity-{rkey}">'
+        f'<div class="sig-card species-{rkey}">'
         '<div class="sig-card-watermark">MO\u00a7ES\u2122 SIGRANK</div>'
-        f'<div class="sig-card-rarity rarity-{rkey}">{rlabel}</div>'
+        f'<div class="sig-card-rarity species-{rkey}">{rlabel}</div>'
         f'<div class="sig-card-name">{name}</div>'
         f'<div class="sig-card-archetype">{archetype}</div>'
         f'<div class="sig-card-passive">Passive: {passive}</div>'
@@ -330,10 +329,10 @@ _ON_SPACE = bool(_os.environ.get("SPACE_ID"))
 
 # Ghost/"unminted" card so the right column is never an empty void on first load.
 CARD_PLACEHOLDER = (
-    '<div class="sig-card rarity-common" id="ghost-card">'
-    '<div class="sig-card-watermark">MO§ES™ SIGRANK</div>'
-    '<div class="sig-card-rarity rarity-common">UNMINTED</div>'
-    '<div class="sig-card-name">Awaiting Operator…</div>'
+    '<div class="sig-card species-throughput" id="ghost-card">'
+    '<div class="sig-card-watermark">MO\u00a7ES\u2122 SIGRANK</div>'
+    '<div class="sig-card-rarity species-throughput">UNMINTED</div>'
+    '<div class="sig-card-name">Awaiting Operator\u2026</div>'
     '<div class="sig-card-archetype">Signal Offline</div>'
     '<div class="sig-card-yield">0,000</div>'
     '<div class="sig-card-yield-label">insert token ledger to scan</div>'
@@ -350,15 +349,38 @@ def _build_demo():
     _lead = (_ys[0] / _ys[1]) if len(_ys) > 1 and _ys[1] > 0 else 0.0
     with _b:
         with gr.Column(elem_id="moses-hero"):
-            gr.HTML("<h1>MO\u00a7ES\u2122 SigRank</h1>"
-                    "<p>The diagnostic x-ray of the token economy // ranked by \u03a5 (Net Volumetric Yield) // volume can't buy rank</p>")
-            gr.HTML('<div id="moses-stat-strip">'
-                    f'<div>OPERATORS RANKED <span>{len(_ops_now)}</span></div>'
-                    f'<div>MO\u00a7ES LEADS BY <span>{_lead:,.0f}\u00d7</span></div>'
-                    '<div>ARCHITECTURE BEATS BUDGET</div>'
-                    '</div>')
-            gr.HTML('<div id="moses-footprint">compute footprint \u00b7 0.5B params (MiniCPM4-0.5B) \u00b7 '
-                    'non-blocking deterministic fallback \u00b7 ZeroGPU \u00b7 \u03a5 = (Cache\u00b7Output)/Input\u00b2</div>')
+            gr.HTML(
+                "<div style='display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #C4923A; padding-bottom: 12px; margin-bottom: 16px;'>"
+                "  <div>"
+                "    <h1 style='color: #C4923A !important; font-size: 36px !important; font-weight: 800 !important; letter-spacing: 0.2em !important; margin: 0 !important; line-height: 1.1;'>MO\u00a7ES<span style='font-size: 16px; vertical-align: super; font-weight: 400; letter-spacing: normal;'>\u2122</span> <span style='color: #E8E0CF; font-weight: 300;'>SIGRANK</span></h1>"
+                "    <p style='color: #8a7f68 !important; font-size: 11px !important; letter-spacing: 0.05em !important; margin: 6px 0 0 0 !important; text-transform: uppercase;'>Diagnostic X-Ray of the Token Economy // Continuous Architectural Profiling</p>"
+                "  </div>"
+                "  <div style='text-align: right; font-size: 10px; color: #8a7f68; letter-spacing: 0.1em; line-height: 1.4; font-weight: bold;'>"
+                "    SYSTEM STATUS: <span style='color: #22c55e;'>ONLINE</span><br>"
+                "    METRIC VECTOR: <span style='color: #C4923A;'>\u03a5 = (C\u00b7O)/I\u00b2</span>"
+                "  </div>"
+                "</div>"
+            )
+            gr.HTML(
+                f'<div id="moses-stat-strip" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; background: #1E1B15; border: 1px solid #3A3324; padding: 12px 18px; border-radius: 6px; margin-bottom: 24px;">'
+                f'  <div style="border-right: 1px solid #3A3324; padding-right: 10px;">'
+                f'    <div style="font-size: 9px; color: #8a7f68; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 2px;">Operators Profiled</div>'
+                f'    <div style="font-size: 20px; color: #E8E0CF; font-weight: 700;">{len(_ops_now)} <span style="font-size: 11px; color: #8a7f68; font-weight: normal;">nodes</span></div>'
+                f'  </div>'
+                f'  <div style="border-right: 1px solid #3A3324; padding-right: 10px; padding-left: 10px;">'
+                f'    <div style="font-size: 9px; color: #8a7f68; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 2px;">Empirical Delta</div>'
+                f'    <div style="font-size: 20px; color: #C4923A; font-weight: 700;">{_lead:,.0f}\u00d7 <span style="font-size: 11px; color: #8a7f68; font-weight: normal;">max \u03a5</span></div>'
+                f'  </div>'
+                f'  <div style="border-right: 1px solid #3A3324; padding-right: 10px; padding-left: 10px;">'
+                f'    <div style="font-size: 9px; color: #8a7f68; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 2px;">Evaluation Strategy</div>'
+                f'    <div style="font-size: 14px; color: #E8E0CF; font-weight: 700; line-height: 1.5; text-transform: uppercase; letter-spacing: 0.02em;">Compounding Loops</div>'
+                f'  </div>'
+                f'  <div style="padding-left: 10px;">'
+                f'    <div style="font-size: 9px; color: #8a7f68; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 2px;">Core Constraint</div>'
+                f'    <div style="font-size: 14px; color: #8a7f68; font-weight: 700; line-height: 1.5; text-transform: uppercase; letter-spacing: 0.02em;"><span style="color: #E8E0CF;">Architecture</span> &gt; Budget</div>'
+                f'  </div>'
+                f'</div>'
+            )
 
         # ---- TAB 1: Leaderboard (board + sticky profile inspector) ----
         with gr.Tab("Leaderboard"):

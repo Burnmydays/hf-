@@ -8,10 +8,10 @@ CSS = """
   --moses-line: #3A3324;
   --moses-ink: #E8E0CF;
   --moses-dim: #8a7f68;
-  --rarity-common: #6b7280;
-  --rarity-rare: #3b82f6;
-  --rarity-epic: #8b5cf6;
-  --rarity-mythic: #C4923A;
+  --species-throughput: #6b7280;
+  --species-converter: #3b82f6;
+  --species-architect: #8b5cf6;
+  --species-cascade: #C4923A;
 }
 .gradio-container, .gradio-container * { font-family: ui-monospace, "SF Mono", Menlo, monospace !important; }
 .gradio-container { background: var(--moses-bg) !important; max-width: 1100px !important; margin: 0 auto !important; }
@@ -31,6 +31,7 @@ CSS = """
   margin: 0 !important;
 }
 #moses-hero p { color: var(--moses-dim) !important; font-size: 12px !important; margin: 6px 0 0 !important; }
+
 /* stat strip */
 #moses-stat-strip {
   display: flex; gap: 24px; margin-top: 10px;
@@ -38,12 +39,19 @@ CSS = """
 }
 #moses-stat-strip span { color: var(--moses-ink); font-weight: 700; }
 
-.tabs, .tabitem { background: transparent !important; border: none !important; }
+/* Tab padding layout stabilization overrides */
+.tabs { background: transparent !important; border: none !important; }
+.tabitem {
+  background: transparent !important;
+  border: none !important;
+  padding: 16px 0px !important;
+}
+.tabitem > div { gap: 20px !important; }
 button.selected { color: var(--moses-gold) !important; border-bottom: 2px solid var(--moses-gold) !important; }
 .tab-nav button { color: var(--moses-dim) !important; font-size: 13px !important; letter-spacing: 0.06em; }
 
 .dataframe, table { background: var(--moses-card) !important; color: var(--moses-ink) !important;
-  border: 1px solid var(--moses-line) !important; font-size: 12px !important; }
+  border: 1px solid var(--moses-line) !important; font-size: 12px !important; width: 100% !important; }
 .dataframe thead th, table thead th { background: var(--moses-bg) !important; color: var(--moses-gold) !important;
   border-bottom: 1px solid var(--moses-gold) !important; font-size: 10px !important;
   letter-spacing: 0.06em !important; text-transform: uppercase; padding: 8px 6px !important; }
@@ -74,9 +82,10 @@ button.primary:hover, #compute-btn:hover { background: #d8a449 !important; }
 .prose, .md, #moses-foot { color: var(--moses-dim) !important; font-size: 11px !important; }
 #moses-foot { border-top: 1px solid var(--moses-line); padding-top: 10px; margin-top: 16px; line-height: 1.7; }
 
-.moses-board { font-family: ui-monospace, monospace; margin-top: 6px; }
-.mb-head, .mb-row { display: grid; grid-template-columns: 28px 1.6fr 0.6fr 0.6fr 0.6fr 0.75fr 0.7fr 1.4fr;
-  align-items: center; gap: 8px; padding: 9px 8px; }
+/* Structural Board Alignment Layout */
+.moses-board { font-family: ui-monospace, monospace; margin-top: 6px; width: 100% !important; box-sizing: border-box !important; }
+.mb-head, .mb-row { display: grid; grid-template-columns: 32px 1.8fr 0.6fr 0.7fr 0.7fr 0.75fr 0.7fr 1.5fr;
+  align-items: center; gap: 12px; padding: 10px 12px; width: 100%; box-sizing: border-box; }
 .mb-head { color: #C4923A; font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase;
   border-bottom: 1px solid #C4923A; }
 .mb-row { border-bottom: 1px solid #3A3324; color: #8a7f68; font-size: 12px; }
@@ -88,10 +97,12 @@ button.primary:hover, #compute-btn:hover { background: #d8a449 !important; }
   color: var(--moses-ink) !important;
 }
 .mb-row.rank1 .mb-yval { color: var(--moses-gold); font-size: 14px; }
-.mb-row.rarity-common  { border-left: 3px solid var(--rarity-common); }
-.mb-row.rarity-rare    { border-left: 3px solid var(--rarity-rare); }
-.mb-row.rarity-epic    { border-left: 3px solid var(--rarity-epic); }
-.mb-row.rarity-mythic  { border-left: 3px solid var(--rarity-mythic); }
+
+/* Species Classification Left Highlights */
+.mb-row.species-throughput  { border-left: 3px solid var(--species-throughput); }
+.mb-row.species-converter   { border-left: 3px solid var(--species-converter); }
+.mb-row.species-architect   { border-left: 3px solid var(--species-architect); }
+.mb-row.species-cascade     { border-left: 3px solid var(--species-cascade); }
 .mb-rank-1 { color: var(--moses-gold); font-weight: 700; }
 .mb-rank-2 { color: #a0a0a0; }
 .mb-rank-3 { color: #8a6a3a; }
@@ -121,10 +132,10 @@ button.primary:hover, #compute-btn:hover { background: #d8a449 !important; }
   font-family: ui-monospace, monospace;
   position: relative;
 }
-.sig-card.rarity-common  { border: 1px solid var(--rarity-common); box-shadow: 0 0 20px rgba(107,114,128,0.12); }
-.sig-card.rarity-rare    { border: 1px solid var(--rarity-rare);   box-shadow: 0 0 24px rgba(59,130,246,0.15); }
-.sig-card.rarity-epic    { border: 1px solid var(--rarity-epic);   box-shadow: 0 0 28px rgba(139,92,246,0.18); }
-.sig-card.rarity-mythic  { border: 1px solid var(--rarity-mythic); box-shadow: 0 0 40px rgba(196,146,58,0.22), inset 0 1px 0 rgba(196,146,58,0.15); }
+.sig-card.species-throughput  { border: 1px solid var(--species-throughput); box-shadow: 0 0 20px rgba(107,114,128,0.12); }
+.sig-card.species-converter   { border: 1px solid var(--species-converter);  box-shadow: 0 0 24px rgba(59,130,246,0.15); }
+.sig-card.species-architect   { border: 1px solid var(--species-architect);  box-shadow: 0 0 28px rgba(139,92,246,0.18); }
+.sig-card.species-cascade     { border: 1px solid var(--species-cascade);    box-shadow: 0 0 40px rgba(196,146,58,0.22), inset 0 1px 0 rgba(196,146,58,0.15); }
 .sig-card-watermark {
   position: absolute; top: 14px; right: 16px;
   font-size: 9px; color: var(--moses-dim); letter-spacing: 0.1em;
@@ -156,14 +167,14 @@ button.primary:hover, #compute-btn:hover { background: #d8a449 !important; }
   font-style: italic;
 }
 .sig-card-rarity { display: inline-block; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 700; padding: 2px 8px; border-radius: 2px; margin-bottom: 8px; }
-.sig-card-rarity.rarity-common  { color: var(--rarity-common); border: 1px solid var(--rarity-common); }
-.sig-card-rarity.rarity-rare    { color: var(--rarity-rare);   border: 1px solid var(--rarity-rare); }
-.sig-card-rarity.rarity-epic    { color: var(--rarity-epic);   border: 1px solid var(--rarity-epic); }
-.sig-card-rarity.rarity-mythic  { color: var(--rarity-mythic); border: 1px solid var(--rarity-mythic); }
+.sig-card-rarity.species-throughput  { color: var(--species-throughput); border: 1px solid var(--species-throughput); }
+.sig-card-rarity.species-converter   { color: var(--species-converter);  border: 1px solid var(--species-converter); }
+.sig-card-rarity.species-architect   { color: var(--species-architect);  border: 1px solid var(--species-architect); }
+.sig-card-rarity.species-cascade     { color: var(--species-cascade);    border: 1px solid var(--species-cascade); }
 .sig-card-passive { font-size: 9px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--moses-dim); margin: 12px 0 4px; }
 .sig-card-effect  { font-size: 10px; color: var(--moses-dim); font-style: italic; border-left: 2px solid #3A3324; padding: 6px 10px; margin-bottom: 14px; line-height: 1.5; }
-.sig-card.rarity-mythic .sig-card-yield { color: var(--rarity-mythic); }
-.sig-card.rarity-mythic .sig-card-name  { color: var(--rarity-mythic); }
+.sig-card.species-cascade .sig-card-yield { color: var(--species-cascade); }
+.sig-card.species-cascade .sig-card-name  { color: var(--species-cascade); }
 .sig-card-footer {
   position: absolute; bottom: 16px; left: 24px; right: 24px;
   font-size: 9px; color: #5f573f; letter-spacing: 0.06em;
@@ -199,10 +210,6 @@ button.primary:hover, #compute-btn:hover { background: #d8a449 !important; }
 
 /* HF login button styling */
 #hf-login-btn { margin-bottom: 8px; }
-
-/* footprint flex line under the hero (Build Small badge) */
-#moses-footprint { margin-top: 8px; font-size: 10px; color: var(--moses-dim);
-  letter-spacing: 0.05em; opacity: 0.85; }
 
 /* "Rank by" radio -> horizontal pill / segmented control (not a gray form) */
 #rank-by { border: none !important; background: transparent !important; padding: 0 !important; }
