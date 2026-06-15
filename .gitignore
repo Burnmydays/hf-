@@ -1,0 +1,12 @@
+# envs / caches
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store
+
+# local-only secrets + working notes (never commit credentials)
+SECRETS.local.md
+.env
+.env.*
