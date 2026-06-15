@@ -41,13 +41,19 @@ def _cost_str(m):
     return f"{mark}${c:.2f}"
 
 # ---------- leaderboard (HTML hero, log-scaled Υ, cost column) ----------
-def board_html(extra=None):
+# column label -> metrics key, used by the "Rank by" control on the board
+SORT_LABELS = {"Υ yield": "yield", "SNR": "snr", "10x DEV": "dev10x",
+               "velocity": "velocity", "leverage": "leverage", "$/1M": "avg_cost_1m"}
+
+def board_html(extra=None, sort_key="yield"):
     ops = operators()
     # dedup: if `extra` is already persisted, replace it so it shows once + highlighted
     rows=[(n,compute(*v)) for n,v in ops.items() if not (extra and n==extra[0])]
     if extra: rows.append(extra)
-    rows.sort(key=lambda r:r[1]["yield"], reverse=True)
-    ymax=rows[0][1]["yield"] or 1
+    ymax=max((m["yield"] for _,m in rows), default=1) or 1   # Υ bar always scales to Υ
+    asc = sort_key == "avg_cost_1m"                          # cheapest leads for cost
+    rows.sort(key=lambda r:(r[1].get(sort_key) if r[1].get(sort_key) is not None
+                            else float("-inf")), reverse=not asc)
     out=['<div class="moses-board">']
     out.append('<div class="mb-head"><span class="mb-rank">#</span>'
                '<span class="mb-op">operator</span>'
@@ -301,6 +307,23 @@ def run_ingest(blob, name, request: gr.Request):
             hits_html,
             board_html((name,m)))
 
+# ---------- interactive leaderboard helpers ----------
+def resort_board(label):
+    """Re-render the board sorted by the chosen column (the 'Rank by' control)."""
+    return board_html(sort_key=SORT_LABELS.get(label, "yield"))
+
+def view_operator(name):
+    """Render a corpus operator's full profile + share card (the 'open a profile' picker)."""
+    ops = operators()
+    if not name or name not in ops:
+        return "", ""
+    m = compute(*ops[name])
+    rows = sorted(((n, compute(*v)) for n, v in ops.items()),
+                  key=lambda r: r[1]["yield"], reverse=True)
+    rank = next(i for i, (n, _) in enumerate(rows, 1) if n == name)
+    read = narrate(name, m, classify(m))
+    return profile_md(name, m, rank, len(rows), read), card_html(name, m, rank, len(rows), read)
+
 # ---------- UI ----------
 import os as _os
 _ON_SPACE = bool(_os.environ.get("SPACE_ID"))
@@ -311,50 +334,71 @@ def _build_demo():
         _b = gr.Blocks(css=CSS, theme=gr.themes.Base(), **_blocks_kw)
     except TypeError:
         _b = gr.Blocks(**_blocks_kw)
+    # dynamic hero stats (don't hardcode counts that drift when the corpus changes)
+    _ops_now = operators()
+    _names = list(_ops_now.keys())
+    _ys = sorted((compute(*v)["yield"] for v in _ops_now.values()), reverse=True)
+    _lead = (_ys[0] / _ys[1]) if len(_ys) > 1 and _ys[1] > 0 else 0.0
     with _b:
         with gr.Column(elem_id="moses-hero"):
             gr.HTML("<h1>MO\u00a7ES\u2122 SigRank</h1>"
                     "<p>the diagnostic x-ray of the token economy \u00b7 ranked by \u03a5 (Net Volumetric Yield) \u00b7 volume can't buy rank</p>")
             gr.HTML('<div id="moses-stat-strip">'
-                    '<div>operators ranked <span>7</span></div>'
-                    '<div>MO\u00a7ES leads by <span>3,141\u00d7</span></div>'
+                    f'<div>operators ranked <span>{len(_ops_now)}</span></div>'
+                    f'<div>MO\u00a7ES leads by <span>{_lead:,.0f}\u00d7</span></div>'
                     '<div>architecture beats budget</div>'
                     '</div>')
 
         with gr.Tab("Leaderboard"):
             gr.Markdown("Ranked by **\u03a5 = (Cache\u00b7Output)/Input\u00b2**. Raw Read\u00b7Create\u00b7In\u00b7Out stacked under each operator. $/1M is blended cost \u2014 efficient architecture is also the cheapest.")
+            rank_by = gr.Radio(list(SORT_LABELS.keys()), value="\u03a5 yield",
+                               label="Rank by \u2014 pick a column to see its leaders")
+            lb = gr.HTML(board_html())
+            rank_by.change(resort_board, rank_by, lb)
             gr.Markdown("*Corpus is curated \u2014 pasting your usage scores you live against the field but doesn't add you to the persisted board unless you're signed in via HuggingFace. $/1M is a list-price recompute (~); real cost shows when you paste your own ccusage. * = structural estimation.*", elem_id="moses-foot")
-            gr.HTML(board_html())
+
+            gr.Markdown("### Operator profiles")
+            op_pick = gr.Dropdown(_names, label="Open an operator's profile", value=None)
+            op_prof = gr.Markdown(elem_id="moses-profile")
+            op_card = gr.HTML()
+            op_pick.change(view_operator, op_pick, [op_prof, op_card])
 
         with gr.Tab("Clock Your Signal"):
-            gr.Markdown("""**Get your operator profile \u2014 measure each provider separately.**
+            gr.Markdown("""### Clock your signal \u2014 4 steps
 
-**\u2460 Get your numbers.** Run one command per provider in your terminal:
+**Step 1 \u00b7 Pull your usage.** In your terminal (needs [Node.js](https://nodejs.org)),
+run **one** of these and copy the JSON it prints.
+
+Claude Code:
 ```
-ccusage claude --json       # Claude Code
-ccusage codex --json        # Codex (estimated *)
+npx ccusage@latest claude --json
 ```
-\u26a0\ufe0f **Run each provider on its own \u2014 never bare `ccusage --json`.** With no
-subcommand it merges every agent into one total, inflating input and distorting your
-architecture. Claude and Codex are different operators \u2014 measure them separately.
-
-Prefer zero copy-paste? Use the local importer (reads your usage on your machine):
+Codex:
 ```
-./sigrank            # Claude Code (measured)
-./sigrank --codex    # Codex (calibrated *)
-./sigrank --all      # each provider, one after another
+npx ccusage@latest codex --json
 ```
+Already have ccusage installed? Drop the prefix and just run `ccusage claude --json`.
+\u26a0\ufe0f Run Claude and Codex **separately** \u2014 never bare `ccusage --json` (no provider). That
+merges every agent into one total and distorts your read.
 
-**\u2461 Paste it below.** Drop one provider's `ccusage` JSON in the box \u2014 we route it
-automatically. No JSON handy? Type four numbers in order:
-`input  output  cache_create  cache_read`.
+**Step 2 \u00b7 Paste it in the box below** and press **Clock My Signal**. No JSON? Type four
+numbers in order: `input  output  cache_create  cache_read`.
 
-*Codex reports no fresh-vs-cache input split, so its input is **estimated**: on its own it
-uses the AA-backed **2:1** baseline; if you also have a Claude profile it uses **your own
-Claude input:output ratio**. Estimated rows are flagged with \\*.*
+**Step 3 \u00b7 Read your profile** \u2014 archetype, cascade, full metrics, and your live board
+placement appear right below.
 
-**\u2462 Sign in to save.** A HuggingFace login earns one persistent board entry + session
-history (Greatest Hits). Pasting without login is a live snapshot only.""")
+**Step 4 \u00b7 (optional) Sign in with HuggingFace** to save your entry to the board + keep
+session history (Greatest Hits). Without login it's a live snapshot only.
+
+---
+**Local importer (optional \u2014 only if you've cloned the repo).** From inside the repo
+folder, run the command **on its own line** (don't paste any trailing notes):
+```
+./sigrank
+```
+Use `./sigrank --codex` for Codex or `./sigrank --all` for both. Needs the repo + Node +
+Python. *Codex input is estimated (`*`): alone \u2192 AA 2:1 baseline; with a Claude profile \u2192
+your own Claude input:output ratio.*""")
             if _ON_SPACE:
                 gr.LoginButton(elem_id="hf-login-btn")
             else:

@@ -58,13 +58,17 @@ Three things: **what data, where to get it, where to put it.**
 
 **1 — What / where to get it.** SigRank needs four integers — `input`, `output`,
 `cache_create`, `cache_read`. [`ccusage`](https://github.com/ryoppippi/ccusage) reads
-them from your local logs. Run **one command per provider** — Claude and Codex are
-different operators, so measure them **separately**:
+them from your local logs (needs Node.js). Run **one command per provider** — Claude and
+Codex are different operators, so measure them **separately** (each command on its own line):
 
 ```
-ccusage claude --json       # Claude Code
-ccusage codex --json        # Codex
+npx ccusage@latest claude --json
 ```
+```
+npx ccusage@latest codex --json
+```
+
+(If ccusage is installed globally, drop the prefix: `ccusage claude --json`.)
 
 > ⚠️ Don't use bare `ccusage --json` (no subcommand): it merges every agent into one
 > total, which inflates input and distorts the architecture read.
