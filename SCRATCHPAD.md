@@ -9,25 +9,29 @@ Last updated: 2026-06-15 (Claude/Opus session) · Deadline: **2026-06-15 23:59 U
 ---
 
 ## ONE-LINE STATE
-Build is ~correct and verified green. Two work-streams remain: **(1) semantics
-fixes** (honesty/labeling/narrative) and **(2) Supabase persistence**. Nothing
-about the core math is in question.
+Importer overhaul + reconcile DONE and pushed to Burnmydays/hf- (main e0e2511).
+Codex parser fixed, `./sigrank --all` added, instructions sharpened, wild corpus =
+10 tokscale operators, Supabase migrated + board synced (11 rows live). Remaining:
+**deploy to Space** (secrets) + **Codex handoff → SunrisesIllNeverSee** + submission.
 
 ## DO NOT TOUCH (frozen — these are the thesis)
-- `metrics.py` SEED numbers — verified this session, canonical.
+- `metrics.py` MO§ES (ccusage) SEED row — canonical (Υ 18436.98). Wild corpus = 10
+  tokscale.ai operators (updated this session, OK to extend with citation).
 - The Υ formula `(C·O)/I²` and the telescoping identity `(o/i)(cw/o)(cr/cw)==cr/i`.
-- The 2:1 Codex anchor must stay **flagged/provisional** — never a silent strict
-  assumption.
+- Codex estimation must stay **flagged/estimated** (`*`) — never a silent strict
+  assumption. Two pathways live in `_codex_input_estimate` (ingest.py):
+  Beta = output × real Claude io_ratio; Alpha = output × 2.0 (AA baseline).
 
-## RESERVED FOR CODEX (leave these — they earn the $10k Codex-attribution prize)
-Do NOT implement these in a non-Codex session; Codex needs the attributed commits.
-See `CODEX.md`. They are:
-1. Refine 2:1 anchor → turn-delta method (keep 2:1 as fallback).
-2. `test_metrics.py` — lock canonical numbers (Υ 18,437, lev 2042, X 3.31, telescoping).
-3. Real Codex `$/1M` via OpenAI per-1M prices in `parse_codex` meta.
-4. Board visual marker on estimated (Codex) rows.
-> Order from FIXES.md: do Codex commits AFTER the repo/Space is in the
-> `build-small-hackathon` org, so attribution lands in the submitted location.
+## RESERVED FOR CODEX (earns the $10k Codex-attribution prize — genuine Codex work only)
+See `CODEX.md`. Still available as fresh Codex commits:
+1. `test_metrics.py` — lock canonical numbers (Υ 18,437, lev 2042, X 3.31, telescoping
+   for every SEED row).
+2. Real Codex `$/1M` via OpenAI per-1M prices in `parse_codex_submission` meta.
+3. The repo upload itself to github.com/SunrisesIllNeverSee.
+> ALREADY DONE this session (Claude) — NO longer available as Codex commits:
+> - Anchor refinement (2:1 → real Claude operating ratio, Alpha/Beta unified).
+> - Board `~`/`*` estimated-row marker.
+> Integrity: only attribute commits Codex actually authored.
 
 ## CANONICAL VERIFY (run after every change)
 ```
