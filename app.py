@@ -364,41 +364,37 @@ def _build_demo():
             op_pick.change(view_operator, op_pick, [op_prof, op_card])
 
         with gr.Tab("Clock Your Signal"):
-            gr.Markdown("""### Clock your signal \u2014 4 steps
+            gr.Markdown("""### Clock your signal \u2014 local-first
 
-**Step 1 \u00b7 Pull your usage.** In your terminal (needs [Node.js](https://nodejs.org)),
-run **one** of these and copy the JSON it prints.
-
-Claude Code:
-```
-npx ccusage@latest claude --json
-```
-Codex:
-```
-npx ccusage@latest codex --json
-```
-Already have ccusage installed? Drop the prefix and just run `ccusage claude --json`.
-\u26a0\ufe0f Run Claude and Codex **separately** \u2014 never bare `ccusage --json` (no provider). That
-merges every agent into one total and distorts your read.
-
-**Step 2 \u00b7 Paste it in the box below** and press **Clock My Signal**. No JSON? Type four
-numbers in order: `input  output  cache_create  cache_read`.
-
-**Step 3 \u00b7 Read your profile** \u2014 archetype, cascade, full metrics, and your live board
-placement appear right below.
-
-**Step 4 \u00b7 (optional) Sign in with HuggingFace** to save your entry to the board + keep
-session history (Greatest Hits). Without login it's a live snapshot only.
-
----
-**Local importer (optional \u2014 only if you've cloned the repo).** From inside the repo
-folder, run the command **on its own line** (don't paste any trailing notes):
+**\u2460 Run the local importer \u2014 the real path.** From the repo folder, run the command
+**on its own line** (don't paste any trailing notes):
 ```
 ./sigrank
 ```
-Use `./sigrank --codex` for Codex or `./sigrank --all` for both. Needs the repo + Node +
-Python. *Codex input is estimated (`*`): alone \u2192 AA 2:1 baseline; with a Claude profile \u2192
-your own Claude input:output ratio.*""")
+`./sigrank --codex` for Codex \u00b7 `./sigrank --all` for both. It reads your usage on your
+machine, computes your profile + \u03a5, and prints your board rank. **No paste, no upload \u2014
+nothing leaves your computer.** (Needs the repo + Python + Node.)
+
+**\u2461 No repo handy? Paste instead (the backup).** In your terminal run one of these
+(needs [Node.js](https://nodejs.org)), copy the JSON, and drop it in the box below:
+```
+npx ccusage@latest claude --json
+```
+```
+npx ccusage@latest codex --json
+```
+Already have ccusage installed? Just `ccusage claude --json`. \u26a0\ufe0f Run Claude and Codex
+**separately** \u2014 never bare `ccusage --json` (it merges every agent and distorts the read).
+No JSON? Type four numbers in order: `input  output  cache_create  cache_read`.
+
+**\u2462 Read your profile** \u2014 archetype, cascade, full metrics, and your live board placement
+appear right below.
+
+**\u2463 (optional) Sign in with HuggingFace** to save your entry + session history (Greatest
+Hits). Without login it's a live snapshot only.
+
+*Codex input is estimated (`*`): alone \u2192 AA 2:1 baseline; with a Claude profile \u2192 your own
+Claude input:output ratio.*""")
             if _ON_SPACE:
                 gr.LoginButton(elem_id="hf-login-btn")
             else:

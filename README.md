@@ -54,12 +54,21 @@ or four numbers →
 - **leaderboard placement** vs real operators, ranked by Υ, with blended **$/1M cost**
 
 ## How to measure yourself
-Three things: **what data, where to get it, where to put it.**
+SigRank is **local-first** — the importer reads your usage on your own machine.
 
-**1 — What / where to get it.** SigRank needs four integers — `input`, `output`,
-`cache_create`, `cache_read`. [`ccusage`](https://github.com/ryoppippi/ccusage) reads
-them from your local logs (needs Node.js). Run **one command per provider** — Claude and
-Codex are different operators, so measure them **separately** (each command on its own line):
+**1 — Primary: the local importer.** From the cloned repo, run the command on its own line:
+
+```
+./sigrank
+```
+
+`./sigrank --codex` for Codex, `./sigrank --all` for both. It runs `ccusage` for you,
+computes your profile + Υ, and prints your board rank. **Nothing leaves your machine.**
+Needs the repo + Python + [Node.js](https://nodejs.org) (for ccusage).
+
+**2 — Backup: paste on the Space.** No repo? Run `ccusage` yourself and paste the JSON
+into the **Clock Your Signal** box. Run **one command per provider** (Claude and Codex are
+different operators — measure them separately):
 
 ```
 npx ccusage@latest claude --json
@@ -68,18 +77,11 @@ npx ccusage@latest claude --json
 npx ccusage@latest codex --json
 ```
 
-(If ccusage is installed globally, drop the prefix: `ccusage claude --json`.)
+(ccusage installed globally? drop the prefix: `ccusage claude --json`.) Or type four
+numbers: `input output cache_create cache_read`.
 
 > ⚠️ Don't use bare `ccusage --json` (no subcommand): it merges every agent into one
 > total, which inflates input and distorts the architecture read.
-
-**2 — Where to put it.** Either:
-
-- **Local importer (no paste):** `./sigrank` (Claude), `./sigrank --codex` (Codex),
-  or `./sigrank --all` (each provider in turn). Reads your usage on your machine and
-  prints your profile + board rank. Nothing leaves your computer.
-- **Hosted Space:** paste one provider's JSON into the **Clock Your Signal** box, or type
-  the four numbers `input output cache_create cache_read`.
 
 **3 — Saving (optional).** On the Space, sign in with HuggingFace to earn one persistent
 board entry + session history (Greatest Hits). Without login, your read is a live
