@@ -167,9 +167,15 @@ with _b as demo:
         lb = gr.HTML(board_html())
 
     with gr.Tab("Measure yourself"):
-        gr.Markdown("""**Get your operator profile.** Run `npx ccusage@latest --json` (Claude Code)
-or `ccusage codex --json` (Codex) and paste the whole thing — or just paste four numbers
-(input, output, cache_create, cache_read).
+        gr.Markdown("""**Get your operator profile — automatic, no paste.**
+
+**① Run the local importer** (reads your usage on your machine, 100% local):
+```
+./sigrank
+```
+(or `python3 sigrank.py`). It auto-runs `ccusage`, computes your profile + Υ, and prints your board rank. No paste, no upload, no token.
+
+**② Paste — the backup.** No importer handy? Run `npx ccusage@latest --json` (Claude Code) or `ccusage codex --json` (Codex) and drop it below, or just four numbers (input, output, cache_create, cache_read).
 *Codex note: combined input is split via the 2:1 field anchor; estimated rows are flagged.*""")
         nm = gr.Textbox(label="operator name", placeholder="your handle", max_lines=1)
         blob = gr.Textbox(label="ccusage / codex JSON  —or—  four numbers", lines=6,
