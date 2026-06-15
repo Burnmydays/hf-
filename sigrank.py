@@ -64,9 +64,9 @@ def _grab_usage(args):
         return open(args.file, encoding="utf-8").read(), f"file {args.file}"
     if args.stdin:
         return sys.stdin.read(), "stdin"
-    # auto: run ccusage on the user's machine
-    sub = ["codex", "--json"] if args.codex else ["--json"]
-    label = "ccusage codex" if args.codex else "ccusage"
+    # auto: run ccusage on the user's machine — subcommand scopes to one agent only
+    sub = ["codex", "--json"] if args.codex else ["claude", "--json"]
+    label = "ccusage codex" if args.codex else "ccusage claude"
     if shutil.which("ccusage"):
         cmd = ["ccusage"] + sub
     elif shutil.which("npx"):

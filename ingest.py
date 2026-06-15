@@ -50,7 +50,8 @@ def is_codex_shape(d):
         elif isinstance(o, list):
             for v in o: scan(v)
     scan(d)
-    return "cached_input_tokens" in keys or "reasoning_output_tokens" in keys
+    return ("cached_input_tokens" in keys or "cachedInputTokens" in keys or
+            "reasoning_output_tokens" in keys or "reasoningOutputTokens" in keys)
 
 def parse_codex(text):
     """
