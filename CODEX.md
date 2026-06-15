@@ -23,21 +23,15 @@ Done and pushed to Burnmydays/hf- (main):
 - Wild corpus = 10 tokscale.ai operators; board = 11 rows; Supabase migrated + synced.
 
 ## Tasks for Codex (each = one attributed commit)
-1. **Turn-delta Codex parser** — the headline Codex-token-parsing work. The current
-   estimate (`_codex_input_estimate` in `ingest.py`) is a single ratio applied to total
-   output. Make it more accurate: when the Codex JSON has **daily/session granularity**,
-   estimate `cache_create` from **per-day context growth** (each day's input above the
-   prior day's floor ≈ new cache writes) instead of one flat ratio. Keep the ratio path
-   (Alpha 2:1 / Beta Claude-ratio) as the fallback when only totals are present, and keep
-   the `*` estimated flag + caveat naming the method used. This is real parsing work on
-   Codex's own token data — the natural Codex-attributed commit.
-2. **`test_metrics.py`** — pytest that locks the canonical numbers and identities:
+> The Codex parser is FINAL by design: the ratio model (Alpha 2:1 / Beta Claude-ratio)
+> handles the estimate — do NOT add turn/daily-delta logic. Tasks below build around it.
+1. **`test_metrics.py`** — pytest that locks the canonical numbers and identities:
    - MO§ES Υ = 18,436.98, leverage = 2042.2, 10x DEV = 3.31.
    - Telescoping identity `(o/i)·(cw/o)·(cr/cw) == cr/i` for every SEED operator with cache.
    - Both Codex pathways: Alpha `output×2`, Beta `output×io_ratio`.
-3. **Real Codex `$/1M`** — wire OpenAI per-1M prices into `parse_codex_submission` meta so
+2. **Real Codex `$/1M`** — wire OpenAI per-1M prices into `parse_codex_submission` meta so
    Codex rows can show real (not list-estimate) cost. Keep the `*` estimated flag on input.
-4. **Upload the repo to `github.com/SunrisesIllNeverSee`** (the prize-submission location).
+3. **Upload the repo to `github.com/SunrisesIllNeverSee`** (the prize-submission location).
 
 ## Verify BEFORE every Codex commit
 ```
