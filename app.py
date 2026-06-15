@@ -45,6 +45,57 @@ def _cost_str(m):
 SORT_LABELS = {"Υ yield": "yield", "SNR": "snr", "10x DEV": "dev10x",
                "velocity": "velocity", "leverage": "leverage", "$/1M": "avg_cost_1m"}
 
+def board_html_slim(extra=None):
+    """3-column mini board for the Clock Your Signal tab (SNR · 10x DEV · Υ)."""
+    ops = operators()
+    rows = [(n, compute(*v)) for n, v in ops.items() if not (extra and n == extra[0])]
+    if extra: rows.append(extra)
+    ymax = max((m["yield"] for _, m in rows), default=1) or 1
+    rows.sort(key=lambda r: r[1]["yield"], reverse=True)
+    out = ['<div class="moses-board">']
+    out.append('<div style="display:grid;grid-template-columns:28px 1fr 0.55fr 0.55fr 1.1fr;'
+               'align-items:center;gap:8px;padding:8px 10px;'
+               'color:#C4923A;font-size:10px;letter-spacing:0.06em;text-transform:uppercase;'
+               'border-bottom:1px solid #C4923A;">'
+               '<span>#</span><span>operator</span>'
+               '<span style="text-align:right">SNR</span>'
+               '<span style="text-align:right">10x DEV</span>'
+               '<span style="text-align:right">\u03a5 yield</span></div>')
+    for i, (n, m) in enumerate(rows, 1):
+        y = m["yield"]; you = extra and n == extra[0]
+        orders = _math.log10(ymax / y) if y > 0 else 99
+        barpct = max(2, 100 * (1 - orders / 5))
+        d = f"{m['dev10x']:.2f}" if m['dev10x'] is not None else "\u2014"
+        rank_cls = f"mb-rank-{i}" if i <= 3 else ""
+        rkey = rarity_class(m)[0]
+        if you:
+            cls = f"species-{rkey} you"
+            row_style = "background:rgba(196,146,58,0.10);color:#E8E0CF;"
+        elif i == 1:
+            cls = f"species-{rkey} rank1"
+            row_style = "background:rgba(196,146,58,0.12);color:#E8E0CF;"
+        else:
+            cls = f"species-{rkey}"
+            row_style = ""
+        ne = _html.escape(n)
+        est_mark = "<span class='mb-est' title='estimated'>*</span>" if m.get("cost_estimated") else ""
+        out.append(
+            f'<div class="mb-row {cls}" style="display:grid;grid-template-columns:28px 1fr 0.55fr 0.55fr 1.1fr;'
+            f'align-items:center;gap:8px;padding:7px 10px;border-bottom:1px solid #3A3324;'
+            f'font-size:11px;{row_style}">'
+            f'<span class="mb-rank {rank_cls}">{i}</span>'
+            f'<span><b style="color:#E8E0CF">{ne}{est_mark}</b></span>'
+            f'<span style="text-align:right;color:#8a7f68">{m["snr"]:.3f}</span>'
+            f'<span style="text-align:right;color:#8a7f68">{d}</span>'
+            f'<span class="mb-y" style="position:relative;display:flex;align-items:center;justify-content:flex-end;min-height:18px">'
+            f'<span class="mb-bar" style="width:{barpct:.0f}%"></span>'
+            f'<span class="mb-yval" style="position:relative;z-index:2;font-weight:700;font-size:11px;padding-right:3px">{y:,.0f}</span>'
+            f'</span></div>'
+        )
+    out.append('</div>')
+    out.append('<div class="mb-foot">\u03a5 bar is log-scaled \u00b7 volume can\'t buy rank</div>')
+    return "".join(out)
+
 def board_html(extra=None, sort_key="yield"):
     ops = operators()
     # dedup: if `extra` is already persisted, replace it so it shows once + highlighted
@@ -304,7 +355,7 @@ def run_ingest(blob, name, request: gr.Request):
             comp_bar_html(m["composition"]),
             card_html(name,m,rank,len(rows),read),
             hits_html,
-            board_html((name,m)))
+            board_html_slim((name,m)))
 
 # ---------- interactive leaderboard helpers ----------
 def resort_board(label):
@@ -432,7 +483,7 @@ npx ccusage@latest codex --json
                                       placeholder='Paste ccusage JSON here\n\nor four numbers: input output cache_create cache_read\n\nExample: 1251211 11296121 128196310 2555179769')
                     go = gr.Button("Clock My Signal", variant="primary", elem_id="compute-btn")
                     gr.Markdown("### Your live board placement")
-                    ob = gr.HTML(board_html())
+                    ob = gr.HTML(board_html_slim())
                     gr.Markdown("### Greatest hits")
                     hits = gr.HTML()
                 with gr.Column(scale=6):
