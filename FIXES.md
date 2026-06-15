@@ -29,7 +29,7 @@ Completed items are moved to the BOTTOM. Everything still TO DO is up top.
 - [ ] If chasing Codex $10k: do Codex commits AFTER repo is in the org
       (so attribution lands in the submitted location) — see CODEX.md
 
-## NEXT BUILD — automatic importer (her-style, paste = backup)
+## NEXT BUILD — automatic importer (local-first, paste = backup)
 - [ ] Clean/sleek local importer that auto-reads ccusage (no paste). See SCRATCHPAD.md.
 
 ## VERIFY (run after every fix)

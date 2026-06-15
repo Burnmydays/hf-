@@ -92,4 +92,4 @@ README tags: `thousand-token-wood` `off-brand` `tiny-titan` `best-demo` `minicpm
 - [x] db.py — Supabase REST read + service-key upsert + session history, SEED fallback.
 - [x] FIX 1 persistence-boundary honesty · FIX 2 cost provenance · FIX 4 species/quadrant
       reframe · FIX 6 grid check.
-- [x] her-style local importer sigrank.py (auto-reads ccusage, paste = backup).
+- [x] local-first importer sigrank.py (auto-reads ccusage, paste = backup).

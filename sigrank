@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# her-style launcher for the SigRank importer — no python/python3 fuss.
+# Launcher for the SigRank importer — no python/python3 fuss.
 # Usage:  ./sigrank            (auto-reads ccusage)
 #         ./sigrank --codex    ./sigrank --file u.json    cat u.json | ./sigrank -
 set -e

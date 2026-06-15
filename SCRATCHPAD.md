@@ -120,7 +120,7 @@ cd /Users/dericmchenry/Desktop/moses-sigrank
   ```
   Until those are set, the app runs on the hardcoded SEED fallback (still works).
 
-## AUTO-INGEST — sigrank.py (her-style local importer, this session)
+## AUTO-INGEST — sigrank.py (local-first importer, this session)
 - `sigrank.py` = local-first CLI. Auto-runs `ccusage --json` (or `--codex`/`--file`/stdin),
   computes via metrics.py, prints a sleek read + live board rank (db.load_operators → SEED fallback).
 - No paste, no token, 100% local. The hosted Space paste box stays as the backup.

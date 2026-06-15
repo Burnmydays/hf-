@@ -2,7 +2,7 @@
 """
 sigrank — local-first importer for MO§ES SigRank.
 
-Her-style: reads YOUR usage on YOUR machine and prints your operator read. No
+Local-first: reads YOUR usage on YOUR machine and prints your operator read. No
 paste, no token, no upload. The hosted Space's paste box is the backup; this is
 the real-app path.
 
