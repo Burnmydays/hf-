@@ -366,32 +366,33 @@ def _build_demo():
         with gr.Tab("Clock Your Signal"):
             gr.Markdown("""### Clock your signal \u2014 local-first
 
-**\u2460 Run the local importer \u2014 the real path.** From the repo folder, run the command
-**on its own line** (don't paste any trailing notes):
+**\u2460 Get the importer, then run it (the real path).** Paste these three lines into your
+terminal \u2014 clone it once, then run it. No install step; it runs on your system Python +
+[Node](https://nodejs.org):
 ```
+git clone https://github.com/SunrisesIllNeverSee/moses-sigrank
+cd moses-sigrank
 ./sigrank
 ```
 `./sigrank --codex` for Codex \u00b7 `./sigrank --all` for both. It reads your usage on your
-machine, computes your profile + \u03a5, and prints your board rank. **No paste, no upload \u2014
-nothing leaves your computer.** (Needs the repo + Python + Node.)
+machine and prints your profile + \u03a5 + board rank. **Nothing leaves your computer.**
 
-**\u2461 No repo handy? Paste instead (the backup).** In your terminal run one of these
-(needs [Node.js](https://nodejs.org)), copy the JSON, and drop it in the box below:
+**\u2461 No terminal? Paste instead (the backup).** Run one of these, copy the JSON, drop it
+in the box below:
 ```
 npx ccusage@latest claude --json
 ```
 ```
 npx ccusage@latest codex --json
 ```
-Already have ccusage installed? Just `ccusage claude --json`. \u26a0\ufe0f Run Claude and Codex
-**separately** \u2014 never bare `ccusage --json` (it merges every agent and distorts the read).
-No JSON? Type four numbers in order: `input  output  cache_create  cache_read`.
+\u26a0\ufe0f Run Claude and Codex **separately** \u2014 never bare `ccusage --json` (it merges every
+agent and distorts the read). No JSON? Type four numbers: `input output cache_create cache_read`.
 
 **\u2462 Read your profile** \u2014 archetype, cascade, full metrics, and your live board placement
 appear right below.
 
-**\u2463 (optional) Sign in with HuggingFace** to save your entry + session history (Greatest
-Hits). Without login it's a live snapshot only.
+**\u2463 (optional) Sign in with HuggingFace** to save your entry + session history. Without
+login it's a live snapshot only.
 
 *Codex input is estimated (`*`): alone \u2192 AA 2:1 baseline; with a Claude profile \u2192 your own
 Claude input:output ratio.*""")

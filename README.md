@@ -56,15 +56,17 @@ or four numbers →
 ## How to measure yourself
 SigRank is **local-first** — the importer reads your usage on your own machine.
 
-**1 — Primary: the local importer.** From the cloned repo, run the command on its own line:
+**1 — Primary: the local importer.** Clone it once, then run it (no install step — it runs
+on system Python + [Node.js](https://nodejs.org)):
 
 ```
+git clone https://github.com/SunrisesIllNeverSee/moses-sigrank
+cd moses-sigrank
 ./sigrank
 ```
 
 `./sigrank --codex` for Codex, `./sigrank --all` for both. It runs `ccusage` for you,
 computes your profile + Υ, and prints your board rank. **Nothing leaves your machine.**
-Needs the repo + Python + [Node.js](https://nodejs.org) (for ccusage).
 
 **2 — Backup: paste on the Space.** No repo? Run `ccusage` yourself and paste the JSON
 into the **Clock Your Signal** box. Run **one command per provider** (Claude and Codex are
