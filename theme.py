@@ -19,10 +19,13 @@ CSS = """
 
 #moses-hero {
   border-bottom: 1px solid var(--moses-gold);
-  padding: 10px 0 8px;
-  margin-bottom: 6px;
+  padding: 10px 0 4px;
+  margin-bottom: 0;
   position: relative;
 }
+/* kill the dead space: Blocks root column adds a 16px gap between hero and tabs */
+.column:has(> #moses-hero) { gap: 4px !important; }
+.tab-wrapper { margin: 0 0 2px 0 !important; padding: 0 !important; }
 #moses-hero h1 {
   color: var(--moses-gold) !important;
   font-size: 32px !important;
@@ -44,14 +47,14 @@ CSS = """
 .tabitem {
   background: transparent !important;
   border: none !important;
-  padding: 8px 0px !important;
+  padding: 2px 0px !important;
 }
 .tabitem > div { gap: 10px !important; }
 button.selected { color: var(--moses-gold) !important; border-bottom: 2px solid var(--moses-gold) !important; }
-/* centered nav links */
-.tab-nav { justify-content: center !important; gap: 6px; }
-.tab-nav button { color: var(--moses-dim) !important; font-size: 14px !important; letter-spacing: 0.08em;
-  text-transform: uppercase; font-weight: 700 !important; padding: 8px 16px !important; }
+/* centered nav links (Gradio 6.x uses .tab-container, not .tab-nav) */
+.tab-nav, .tab-container { justify-content: center !important; gap: 6px; }
+.tab-nav button, .tab-container > button { color: var(--moses-dim) !important; font-size: 14px !important;
+  letter-spacing: 0.08em; text-transform: uppercase; font-weight: 700 !important; padding: 8px 16px !important; }
 
 .dataframe, table { background: var(--moses-card) !important; color: var(--moses-ink) !important;
   border: 1px solid var(--moses-line) !important; font-size: 12px !important; width: 100% !important; }
@@ -173,7 +176,7 @@ button.primary:hover, #compute-btn:hover { background: #d8a449 !important; }
 
 /* metric standard (feature row) */
 .mf-head { text-align: center; color: var(--moses-ink); font-size: 26px; font-weight: 800;
-  letter-spacing: 0.01em; margin: 6px 0 14px; line-height: 1.2; }
+  letter-spacing: 0.01em; margin: 0 0 14px; line-height: 1.2; }
 .mf-head span { color: var(--moses-gold); text-shadow: 0 0 18px rgba(196,146,58,0.35); }
 @media (max-width: 700px) { .mf-head { font-size: 20px; } }
 .mf-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
