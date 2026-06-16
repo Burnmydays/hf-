@@ -35,9 +35,9 @@ def _fmt_int(n):
     return str(int(n))
 
 def _fmt_whole(n):
-    """Whole-number K/M/B/T (no decimals) — for the ledger column."""
+    """One-decimal K/M/B/T — for the ledger column."""
     for u,d in (("T",1e12),("B",1e9),("M",1e6),("K",1e3)):
-        if abs(n)>=d: return f"{round(n/d)}{u}"
+        if abs(n)>=d: return f"{n/d:.1f}{u}"
     return str(int(n))
 
 def _fmt_cost(c):
