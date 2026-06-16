@@ -456,12 +456,19 @@ footer { display: none !important; }
 }
 
 @media (max-width: 700px) {
-  /* root cause of mobile overflow: 58px SIGRANK is wider than a phone and forces
-     the whole page to scroll sideways, shoving board columns off-screen. */
+  /* Mobile overflow fix. Two real causes (found via live DOM inspection):
+     1) Gradio's fillable container + flex children (default min-width:auto) refuse
+        to shrink below content, pinning the page at ~1100px and scrolling sideways.
+     2) the marquee track is ~5000px wide; its wrapper must hard-clip.
+     min-width:0 lets the flex children collapse to the viewport. */
+  html, body { overflow-x: hidden !important; max-width: 100vw !important; }
+  .gradio-container, .main, .wrap, .contain, .column, .block {
+    max-width: 100% !important; min-width: 0 !important; }
+  .pm-wrap { max-width: 100% !important; overflow: hidden !important; }
+  .gradio-container { padding-left: 8px !important; padding-right: 8px !important; }
   #moses-hero h1 { font-size: 34px !important; letter-spacing: 0.08em !important; }
   #moses-hero { padding-top: 26px; }       /* clear the HF Space pill on phones */
   #moses-hero p { font-size: 12px !important; }
   #rank-by, #rank-by .wrap { flex-wrap: wrap !important; }   /* Rank-by chips wrap, not overflow */
-  .gradio-container { padding-left: 8px !important; padding-right: 8px !important; }
 }
 """
