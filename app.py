@@ -34,6 +34,12 @@ def _fmt_int(n):
         if abs(n)>=d: return f"{n/d:.2f}{u}"
     return str(int(n))
 
+def _fmt_whole(n):
+    """Whole-number K/M/B/T (no decimals) — for the ledger column."""
+    for u,d in (("T",1e12),("B",1e9),("M",1e6),("K",1e3)):
+        if abs(n)>=d: return f"{round(n/d)}{u}"
+    return str(int(n))
+
 def _fmt_cost(c):
     """Adaptive $/1M: keep sub-cent values legible instead of rounding to $0.00.
     e.g. $0.000195 -> $0.0002 (2 sig figs) rather than $0.00."""
@@ -119,7 +125,7 @@ def board_html(extra=None, sort_key="yield"):
                '<span class="mb-num">velocity</span><span class="mb-num">leverage</span>'
                '<span class="mb-num">$/1M</span>'
                '<span class="mb-y">\u03a5 yield</span>'
-               '<span class="mb-ledger">ledger \u00b7 R\u00b7C\u00b7I\u00b7O</span></div>')
+               '<span class="mb-ledger">ledger \u00b7 R\u00b7C\u00b7I\u00b7O\u00b7\u03a3</span></div>')
     for i,(n,m) in enumerate(rows,1):
         y=m["yield"]; you = extra and n==extra[0]
         orders=_math.log10(ymax/y) if y>0 else 99
@@ -145,7 +151,7 @@ def board_html(extra=None, sort_key="yield"):
             f'<span class="mb-num">{_cost_str(m)}</span>'
             f'<span class="mb-y"><span class="mb-bar" style="width:{barpct:.0f}%"></span>'
             f'<span class="mb-yval">{y:,.0f}</span></span>'
-            f'<span class="mb-ledger">R {_fmt_int(m["raw"]["cache_read"])} \u00b7 C {_fmt_int(m["raw"]["cache_create"])} \u00b7 I {_fmt_int(m["raw"]["input"])} \u00b7 O {_fmt_int(m["raw"]["output"])}</span>'
+            f'<span class="mb-ledger">R {_fmt_whole(m["raw"]["cache_read"])} \u00b7 C {_fmt_whole(m["raw"]["cache_create"])} \u00b7 I {_fmt_whole(m["raw"]["input"])} \u00b7 O {_fmt_whole(m["raw"]["output"])} \u00b7 \u03a3 {_fmt_whole(m["raw"]["cache_read"]+m["raw"]["cache_create"]+m["raw"]["input"]+m["raw"]["output"])}</span>'
             f'</div>')
     out.append('</div>')
     out.append('<div class="mb-foot">\u03a5 bar is log-scaled \u00b7 MO\u00a7ES leads the field by ~4 orders of magnitude \u00b7 $/1M blended cost (~ = list-price estimate) \u00b7 * = structural estimation \u00b7 volume can\'t buy rank</div>')

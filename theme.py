@@ -123,7 +123,8 @@ button.primary:hover, #compute-btn:hover { background: #d8a449 !important; }
 .mb-row b { color: #E8E0CF; font-family: var(--font-sans, sans-serif); font-size: 13px; }
 .mb-raw { color: #7a7060; font-size: 9.5px; }
 .mb-num { text-align: right; }
-.mb-y { position: relative; display: flex; align-items: center; justify-content: flex-end; gap: 6px; min-height: 20px; }
+.mb-y { position: relative; display: flex; align-items: center; justify-content: flex-end; gap: 6px;
+  min-height: 20px; overflow: hidden; border-radius: 3px; }
 .mb-bar { position: absolute; left: 0; top: 50%; transform: translateY(-50%); height: 14px;
   background: linear-gradient(90deg, rgba(196,146,58,0.28), rgba(196,146,58,0.72)); border-radius: 2px; }
 .mb-row.you .mb-bar { background: linear-gradient(90deg, rgba(196,146,58,0.4), #C4923A); }
