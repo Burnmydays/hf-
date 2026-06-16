@@ -90,8 +90,11 @@ button.primary:hover, #compute-btn:hover { background: #d8a449 !important; }
 
 /* Structural Board Alignment Layout */
 .moses-board { font-family: ui-monospace, monospace; margin-top: 6px; width: 100% !important; box-sizing: border-box !important; }
-.mb-head, .mb-row { display: grid; grid-template-columns: 32px 1.8fr 0.6fr 0.7fr 0.7fr 0.75fr 0.7fr 1.5fr;
-  align-items: center; gap: 12px; padding: 10px 12px; width: 100%; box-sizing: border-box; }
+.mb-head, .mb-row { display: grid; grid-template-columns: 28px 1.6fr 0.6fr 0.7fr 0.65fr 0.7fr 0.65fr 1.4fr;
+  align-items: center; gap: 8px; padding: 8px 12px; width: 100%; box-sizing: border-box; }
+/* sharp tabular separators between numeric columns */
+.mb-head .mb-num, .mb-row .mb-num, .mb-head .mb-y, .mb-row .mb-y {
+  border-left: 1px solid #2c2718; padding-left: 8px; }
 .mb-head { color: #C4923A; font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase;
   border-bottom: 1px solid #C4923A; }
 .mb-row { border-bottom: 1px solid #3A3324; color: #8a7f68; font-size: 12px; }

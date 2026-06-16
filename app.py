@@ -719,13 +719,13 @@ def _build_demo():
     with _b:
         with gr.Column(elem_id="moses-hero"):
             gr.HTML(
-                "<div style='display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #C4923A; padding-bottom: 10px; margin-bottom: 10px; gap: 20px;'>"
-                "  <div>"
+                "<div style='position: relative; text-align: center; border-bottom: 2px solid #C4923A; padding-bottom: 10px; margin-bottom: 10px;'>"
+                "  <div style='display: inline-block; text-align: center;'>"
                 "    <div style='color: #8a7f68; font-size: 10px; letter-spacing: 0.28em; text-transform: uppercase; margin-bottom: 2px;'>Powered by MO\u00a7ES\u2122</div>"
                 "    <h1 style='margin: 0 !important; line-height: 0.95; text-shadow: 0 0 24px rgba(196,146,58,0.25);'>SIGRANK</h1>"
-                "    <p style='color: #E8E0CF !important; font-size: 13.5px !important; letter-spacing: 0.01em !important; margin: 8px 0 0 0 !important; font-weight: 600; max-width: 640px; line-height: 1.45;'>Ranking AI operators on performance, production, architecture &amp; cost efficiency. <span style='color:#C4923A;'>Identifying Burners, Builders, and 10\u00d7ers.</span></p>"
+                "    <p style='color: #E8E0CF !important; font-size: 13.5px !important; letter-spacing: 0.01em !important; margin: 8px auto 0 !important; font-weight: 600; max-width: 640px; line-height: 1.45;'>Ranking AI operators on performance, production, architecture &amp; cost efficiency. <span style='color:#C4923A;'>Identifying Burners, Builders, and 10\u00d7ers.</span></p>"
                 "  </div>"
-                f"  <div class='hero-stat'>"
+                f"  <div class='hero-stat' style='position: absolute; top: 0; right: 0;'>"
                 f"    <div class='hs-row'>TRANSMISSION STATUS <span style='color:#22c55e;'>\u25cf ONLINE</span></div>"
                 f"    <div class='hs-row'>METRIC VECTOR <span style='color:#C4923A;'>\u03a5 = (C\u00b7O)/I\u00b2</span></div>"
                 f"    <div class='hs-div'></div>"
