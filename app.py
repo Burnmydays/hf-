@@ -651,7 +651,7 @@ def _build_demo():
                 "<div style='display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #C4923A; padding-bottom: 10px; margin-bottom: 10px; gap: 20px;'>"
                 "  <div>"
                 "    <div style='color: #8a7f68; font-size: 10px; letter-spacing: 0.28em; text-transform: uppercase; margin-bottom: 2px;'>Powered by MO\u00a7ES\u2122</div>"
-                "    <h1 style='color: #C4923A !important; font-size: 58px !important; font-weight: 800 !important; letter-spacing: 0.16em !important; margin: 0 !important; line-height: 0.95; text-shadow: 0 0 24px rgba(196,146,58,0.25);'>SIGRANK</h1>"
+                "    <h1 style='margin: 0 !important; line-height: 0.95; text-shadow: 0 0 24px rgba(196,146,58,0.25);'>SIGRANK</h1>"
                 "    <p style='color: #E8E0CF !important; font-size: 13.5px !important; letter-spacing: 0.01em !important; margin: 8px 0 0 0 !important; font-weight: 600; max-width: 640px; line-height: 1.45;'>Ranking AI operators on performance, production, architecture &amp; cost efficiency. <span style='color:#C4923A;'>Identifying Burners, Builders, and 10\u00d7ers.</span></p>"
                 "  </div>"
                 f"  <div class='hero-stat'>"

@@ -14,7 +14,7 @@ CSS = """
   --species-cascade: #C4923A;
 }
 .gradio-container, .gradio-container * { font-family: ui-monospace, "SF Mono", Menlo, monospace !important; }
-.gradio-container { background: var(--moses-bg) !important; max-width: 1100px !important; margin: 0 auto !important; }
+.gradio-container { background: var(--moses-bg) !important; max-width: 1100px !important; margin: 0 auto !important; overflow-x: hidden !important; }
 .dark .gradio-container, body { background: var(--moses-bg) !important; }
 
 #moses-hero {
@@ -28,9 +28,9 @@ CSS = """
 .tab-wrapper { margin: 0 0 2px 0 !important; padding: 0 !important; }
 #moses-hero h1 {
   color: var(--moses-gold) !important;
-  font-size: 32px !important;
+  font-size: 58px !important;
   letter-spacing: 0.16em !important;
-  font-weight: 700 !important;
+  font-weight: 800 !important;
   margin: 0 !important;
 }
 #moses-hero p { color: var(--moses-dim) !important; font-size: 12px !important; margin: 6px 0 0 !important; }
@@ -453,5 +453,15 @@ footer { display: none !important; }
   .mb-op { min-width: 0; overflow-wrap: anywhere; }
   .mb-raw { font-size: 9px; line-height: 1.35; }
   .mb-y, .mb-yval { font-size: 11px !important; }
+}
+
+@media (max-width: 700px) {
+  /* root cause of mobile overflow: 58px SIGRANK is wider than a phone and forces
+     the whole page to scroll sideways, shoving board columns off-screen. */
+  #moses-hero h1 { font-size: 34px !important; letter-spacing: 0.08em !important; }
+  #moses-hero { padding-top: 26px; }       /* clear the HF Space pill on phones */
+  #moses-hero p { font-size: 12px !important; }
+  #rank-by, #rank-by .wrap { flex-wrap: wrap !important; }   /* Rank-by chips wrap, not overflow */
+  .gradio-container { padding-left: 8px !important; padding-right: 8px !important; }
 }
 """
