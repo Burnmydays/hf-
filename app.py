@@ -761,15 +761,15 @@ def _build_demo():
     with _b:
         with gr.Column(elem_id="moses-hero"):
             gr.HTML(
-                "<div style='display: flex; align-items: flex-end; justify-content: space-between; gap: 28px; border-bottom: 2px solid #C4923A; padding: 4px 0 12px; margin-bottom: 10px;'>"
+                "<div style='display: flex; align-items: flex-end; justify-content: space-between; gap: 28px; border-bottom: 2px solid #C4923A; padding: 4px 0 4px; margin-bottom: 10px;'>"
                 "  <div style='text-align: left; flex: none;'>"
                 "    <div style='color: #8a7f68; font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 2px;'>Powered by MO\u00a7ES\u2122</div>"
                 "    <h1 style='margin: 0 !important; line-height: 0.9; text-shadow: 0 0 24px rgba(196,146,58,0.25);'>SIGRANK</h1>"
                 "  </div>"
-                "  <div style='flex: none; align-self: center;'><div class='moses-logo'><span class='ml-s'>§</span></div></div>"
-                "  <div style='text-align: right; color: #E8E0CF; font-size: 14px; font-weight: 600; line-height: 1.5; max-width: 420px; padding-top: 34px;'>"
-                "    Ranking AI operators on performance, production, architecture &amp; cost efficiency. "
-                "    <span style='color:#C4923A;'>Identifying Burners, Builders, and 10\u00d7ers.</span>"
+                "  <div style='flex: none; align-self: flex-end;'><div class='moses-logo'><span class='ml-s'>§</span></div></div>"
+                "  <div style='text-align: right; max-width: 440px; line-height: 1.4;'>"
+                "    <div style='color:#C4923A; font-size: 14px; font-weight: 700;'>Identifying Burners, Builders, and 10\u00d7ers.</div>"
+                "    <div style='color:#E8E0CF; font-size: 13px; font-weight: 600; margin-top: 3px;'>Ranking AI operators on performance, production, architecture &amp; cost efficiency.</div>"
                 "  </div>"
                 "</div>"
             )
