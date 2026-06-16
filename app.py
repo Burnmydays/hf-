@@ -118,7 +118,8 @@ def board_html(extra=None, sort_key="yield"):
                '<span class="mb-num">SNR</span><span class="mb-num">10x DEV</span>'
                '<span class="mb-num">velocity</span><span class="mb-num">leverage</span>'
                '<span class="mb-num">$/1M</span>'
-               '<span class="mb-y">\u03a5 yield</span></div>')
+               '<span class="mb-y">\u03a5 yield</span>'
+               '<span class="mb-ledger">ledger \u00b7 R\u00b7C\u00b7I\u00b7O</span></div>')
     for i,(n,m) in enumerate(rows,1):
         y=m["yield"]; you = extra and n==extra[0]
         orders=_math.log10(ymax/y) if y>0 else 99
@@ -136,7 +137,7 @@ def board_html(extra=None, sort_key="yield"):
         est_mark = " <span class='mb-est' title='* structural estimation'>*</span>" if m.get("cost_estimated") else ""
         out.append(f'<div class="{cls}">'
             f'<span class="mb-rank {rank_cls}">{i}</span>'
-            f'<span class="mb-op"><b>{ne}{est_mark}</b><br><span class="mb-raw">R {_fmt_int(m["raw"]["cache_read"])} \u00b7 C {_fmt_int(m["raw"]["cache_create"])} \u00b7 I {_fmt_int(m["raw"]["input"])} \u00b7 O {_fmt_int(m["raw"]["output"])}</span></span>'
+            f'<span class="mb-op"><b>{ne}{est_mark}</b></span>'
             f'<span class="mb-num">{m["snr"]:.3f}</span>'
             f'<span class="mb-num">{d}</span>'
             f'<span class="mb-num">{m["velocity"]:.2f}</span>'
@@ -144,6 +145,7 @@ def board_html(extra=None, sort_key="yield"):
             f'<span class="mb-num">{_cost_str(m)}</span>'
             f'<span class="mb-y"><span class="mb-bar" style="width:{barpct:.0f}%"></span>'
             f'<span class="mb-yval">{y:,.0f}</span></span>'
+            f'<span class="mb-ledger">R {_fmt_int(m["raw"]["cache_read"])} \u00b7 C {_fmt_int(m["raw"]["cache_create"])} \u00b7 I {_fmt_int(m["raw"]["input"])} \u00b7 O {_fmt_int(m["raw"]["output"])}</span>'
             f'</div>')
     out.append('</div>')
     out.append('<div class="mb-foot">\u03a5 bar is log-scaled \u00b7 MO\u00a7ES leads the field by ~4 orders of magnitude \u00b7 $/1M blended cost (~ = list-price estimate) \u00b7 * = structural estimation \u00b7 volume can\'t buy rank</div>')
@@ -733,12 +735,12 @@ def _build_demo():
     with _b:
         with gr.Column(elem_id="moses-hero"):
             gr.HTML(
-                "<div style='display: flex; align-items: center; justify-content: space-between; gap: 28px; border-bottom: 2px solid #C4923A; padding-bottom: 12px; margin-bottom: 10px;'>"
+                "<div style='display: flex; align-items: flex-end; justify-content: space-between; gap: 28px; border-bottom: 2px solid #C4923A; padding: 4px 0 12px; margin-bottom: 10px;'>"
                 "  <div style='text-align: left; flex: none;'>"
                 "    <div style='color: #8a7f68; font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 2px;'>Powered by MO\u00a7ES\u2122</div>"
                 "    <h1 style='margin: 0 !important; line-height: 0.9; text-shadow: 0 0 24px rgba(196,146,58,0.25);'>SIGRANK</h1>"
                 "  </div>"
-                "  <div style='text-align: right; color: #E8E0CF; font-size: 14px; font-weight: 600; line-height: 1.5; max-width: 460px;'>"
+                "  <div style='text-align: right; color: #E8E0CF; font-size: 14px; font-weight: 600; line-height: 1.5; max-width: 440px; padding-top: 34px;'>"
                 "    Ranking AI operators on performance, production, architecture &amp; cost efficiency. "
                 "    <span style='color:#C4923A;'>Identifying Burners, Builders, and 10\u00d7ers.</span>"
                 "  </div>"

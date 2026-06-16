@@ -90,8 +90,11 @@ button.primary:hover, #compute-btn:hover { background: #d8a449 !important; }
 
 /* Structural Board Alignment Layout */
 .moses-board { font-family: ui-monospace, monospace; margin-top: 6px; width: 100% !important; box-sizing: border-box !important; }
-.mb-head, .mb-row { display: grid; grid-template-columns: 28px 1.6fr 0.6fr 0.7fr 0.65fr 0.7fr 0.65fr 1.4fr;
-  align-items: center; gap: 8px; padding: 8px 12px; width: 100%; box-sizing: border-box; }
+.mb-head, .mb-row { display: grid; grid-template-columns: 26px 0.95fr 0.5fr 0.55fr 0.5fr 0.55fr 0.5fr 0.9fr 1.5fr;
+  align-items: center; gap: 8px; padding: 7px 12px; width: 100%; box-sizing: border-box; }
+.mb-ledger { color: #7a7060; font-size: 10px; font-family: ui-monospace, monospace; text-align: right;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border-left: 1px solid #2c2718; padding-left: 8px; }
+.mb-head .mb-ledger { color: #C4923A; }
 /* sharp tabular separators between numeric columns */
 .mb-head .mb-num, .mb-row .mb-num, .mb-head .mb-y, .mb-row .mb-y {
   border-left: 1px solid #2c2718; padding-left: 8px; }
@@ -506,6 +509,7 @@ footer { display: none !important; }
   .mb-row span:nth-child(3), .mb-row span:nth-child(4) { display: none !important; }
   .mb-op { min-width: 0; overflow-wrap: anywhere; }
   .mb-raw { font-size: 9px; line-height: 1.35; }
+  .mb-ledger { display: none !important; }
   .mb-y, .mb-yval { font-size: 11px !important; }
 }
 
