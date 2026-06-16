@@ -476,21 +476,92 @@ def profile_marquee_html():
     # chips duplicated so the translateX(-50%) loop is seamless
     return f'<div class="pm-wrap"><div class="pm-track">{chips}{chips}</div></div>'
 
+# ---- the metric standard (green feature row) ----
+_FEATURE_METRICS = [
+    ("Υ", "(Cache·Output)/Input²", "the efficiency score"),
+    ("SNR", "Out/(In+Out)", "signal vs noise"),
+    ("10x DEV", "log₁₀ cascade", "amplification decades"),
+    ("$/1M", "blended cost", "efficiency = cheapest"),
+]
+
+def metric_features_html():
+    boxes = "".join(
+        f'<div class="mf-box"><div class="mf-sym">{s}</div>'
+        f'<div class="mf-form">{f}</div><div class="mf-tag">{t}</div></div>'
+        for s, f, t in _FEATURE_METRICS
+    )
+    return ('<div class="mf-head">Introducing the new standard in '
+            '<span>AI metrics &amp; benchmarks</span></div>'
+            f'<div class="mf-grid">{boxes}</div>')
+
+# ---- mini live samples for each section box ----
+def _top_rows(n):
+    return sorted(((k, compute(*v)) for k, v in operators().items()),
+                  key=lambda r: r[1]["yield"], reverse=True)[:n]
+
+def _sample_leaders():
+    return "".join(
+        f'<div class="sm-row"><span class="sm-rk">#{i}</span>'
+        f'<span class="sm-nm">{_html.escape(k)}</span>'
+        f'<span class="sm-y">Υ {m["yield"]:,.0f}</span></div>'
+        for i, (k, m) in enumerate(_top_rows(3), 1))
+
+def _sample_reports():
+    k, m = _top_rows(1)[0]
+    return (f'<div class="sm-card"><div class="sm-nm">{_html.escape(k)}</div>'
+            f'<div class="sm-kv">Υ {m["yield"]:,.0f} · SNR {m["snr"]:.2f} · '
+            f'{m["leverage"]:,.0f}× lev</div></div>')
+
+def _sample_vs():
+    (a, ma), (b, mb) = _top_rows(2)
+    return (f'<div class="sm-vs"><span class="sm-nm">{_html.escape(a)}</span>'
+            f'<span class="sm-y">Υ {ma["yield"]:,.0f}</span>'
+            f'<span class="sm-vsx">vs</span>'
+            f'<span class="sm-nm">{_html.escape(b)}</span>'
+            f'<span class="sm-y2">Υ {mb["yield"]:,.0f}</span></div>')
+
+def _sample_create():
+    return ('<div class="sm-create"><code>1251211 11296121 …</code>'
+            '<span class="sm-arrow">→</span><span class="sm-y">Υ 18,437</span></div>')
+
 _HOME_SECTIONS = [
-    ("Leaders", "The ranked field", "See who wins on architecture, not spend — the whole field, sorted by Υ."),
-    ("Reports", "Full operator read", "Pull any operator's complete profile and a shareable card."),
-    ("VS", "Head-to-head", "Put 2–3 operators side by side. Gold cell takes each metric."),
-    ("Create", "Clock your signal", "Drop your token ledger, get scored, claim your operator card."),
+    ("Leaders", "Prove your signal",
+     "The burn-vs-build board — who wins on architecture, not spend.", _sample_leaders),
+    ("Reports", "Study the field",
+     "Pull any operator's full read. R&D — improve yourself.", _sample_reports),
+    ("VS", "Head-to-head",
+     "Who's actually 10×? Who's amplifying signal — and at what cost?", _sample_vs),
+    ("Create", "Clock your signal",
+     "Drop your token ledger, get scored, claim your operator card.", _sample_create),
 ]
 
 def home_html():
     boxes = "".join(
         f'<div class="hm-box"><div class="hm-title">◢ {t}</div>'
         f'<div class="hm-sub">{s}</div><div class="hm-desc">{d}</div>'
+        f'<div class="hm-sample">{sample()}</div>'
         f'<div class="hm-cta">open the {t} tab →</div></div>'
-        for t, s, d in _HOME_SECTIONS
+        for t, s, d, sample in _HOME_SECTIONS
     )
     return f'<div class="hm-grid">{boxes}</div>'
+
+def home_footer_html():
+    loom = "https://www.loom.com/share/edc345e2e5164e20aed3acb6436a08c3"
+    return (
+        '<div class="hm-foot">'
+        '<div class="hf-col"><div class="hf-h">Watch the demo</div>'
+        f'<a class="hf-btn" href="{loom}" target="_blank" rel="noopener">▶ Play demo video</a></div>'
+        '<div class="hf-col"><div class="hf-h">Get ranked in 3 steps</div>'
+        '<ol class="hf-steps">'
+        '<li>Run <code>npx ccusage@latest claude --json</code></li>'
+        '<li>Open <b>Create</b>, paste it (or four numbers)</li>'
+        '<li>Get your Υ score + operator card</li></ol></div>'
+        '<div class="hf-col"><div class="hf-h">More</div>'
+        '<a class="hf-link" href="https://mos2es.com" target="_blank" rel="noopener">mos2es.com</a>'
+        '<a class="hf-link" href="https://mos2es.com/benchmarks" target="_blank" rel="noopener">benchmarks</a>'
+        '<a class="hf-link" href="https://x.com/burnmydays/status/2066666214143758576" target="_blank" rel="noopener">@burnmydays on X</a>'
+        '</div></div>'
+    )
 
 # ---------- UI ----------
 import os as _os
@@ -523,8 +594,7 @@ def _build_demo():
                 "  <div>"
                 "    <div style='color: #8a7f68; font-size: 10px; letter-spacing: 0.28em; text-transform: uppercase; margin-bottom: 2px;'>Powered by MO\u00a7ES\u2122</div>"
                 "    <h1 style='color: #C4923A !important; font-size: 44px !important; font-weight: 800 !important; letter-spacing: 0.18em !important; margin: 0 !important; line-height: 1.0;'>SIGRANK</h1>"
-                "    <p style='color: #E8E0CF !important; font-size: 14px !important; letter-spacing: 0.02em !important; margin: 8px 0 0 0 !important; font-weight: 600;'>The performance ranking for AI operators. <span style='color:#C4923A;'>Volume is loud \u2014 architecture wins.</span></p>"
-                "    <p style='color: #8a7f68 !important; font-size: 12px !important; margin: 4px 0 0 0 !important;'>Rank it. Compare it. Prove your loop \u2014 scored on how you build, not how much you burn.</p>"
+                "    <p style='color: #E8E0CF !important; font-size: 13.5px !important; letter-spacing: 0.01em !important; margin: 7px 0 0 0 !important; font-weight: 600; max-width: 620px; line-height: 1.4;'>Ranking AI operators on performance, production, architecture &amp; cost efficiency \u2014 turning noise into signal to show <span style='color:#C4923A;'>who's building vs who's burning.</span></p>"
                 "  </div>"
                 "  <div style='text-align: right; font-size: 10px; color: #8a7f68; letter-spacing: 0.1em; line-height: 1.4; font-weight: bold; white-space: nowrap;'>"
                 "    SYSTEM STATUS: <span style='color: #22c55e;'>ONLINE</span><br>"
@@ -532,32 +602,14 @@ def _build_demo():
                 "  </div>"
                 "</div>"
             )
-            gr.HTML(
-                f'<div id="moses-stat-strip" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; background: #1E1B15; border: 1px solid #3A3324; padding: 10px 18px; border-radius: 6px; margin-bottom: 10px;">'
-                f'  <div style="border-right: 1px solid #3A3324; padding-right: 10px;">'
-                f'    <div style="font-size: 9px; color: #8a7f68; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 2px;">Operators Profiled</div>'
-                f'    <div style="font-size: 20px; color: #E8E0CF; font-weight: 700;">{len(_ops_now)} <span style="font-size: 11px; color: #8a7f68; font-weight: normal;">nodes</span></div>'
-                f'  </div>'
-                f'  <div style="border-right: 1px solid #3A3324; padding-right: 10px; padding-left: 10px;">'
-                f'    <div style="font-size: 9px; color: #8a7f68; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 2px;">Empirical Delta</div>'
-                f'    <div style="font-size: 20px; color: #C4923A; font-weight: 700;">{_lead:,.0f}\u00d7 <span style="font-size: 11px; color: #8a7f68; font-weight: normal;">max \u03a5</span></div>'
-                f'  </div>'
-                f'  <div style="border-right: 1px solid #3A3324; padding-right: 10px; padding-left: 10px;">'
-                f'    <div style="font-size: 9px; color: #8a7f68; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 2px;">Evaluation Strategy</div>'
-                f'    <div style="font-size: 14px; color: #E8E0CF; font-weight: 700; line-height: 1.5; text-transform: uppercase; letter-spacing: 0.02em;">Compounding Loops</div>'
-                f'  </div>'
-                f'  <div style="padding-left: 10px;">'
-                f'    <div style="font-size: 9px; color: #8a7f68; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 2px;">Core Constraint</div>'
-                f'    <div style="font-size: 14px; color: #8a7f68; font-weight: 700; line-height: 1.5; text-transform: uppercase; letter-spacing: 0.02em;"><span style="color: #E8E0CF;">Architecture</span> &gt; Budget</div>'
-                f'  </div>'
-                f'</div>'
-            )
-
-        # ---- TAB: Home (landing — scrolling profiles + section minis) ----
-        with gr.Tab("Home"):
-            gr.HTML('<div class="hm-lead">Live field, scrolling by Υ — hover to pause.</div>')
+            # full-width live leaderboard scroller (replaces the old static stat strip)
             gr.HTML(profile_marquee_html())
+
+        # ---- TAB: Home (landing — metric standard + section minis + links) ----
+        with gr.Tab("Home"):
+            gr.HTML(metric_features_html())
             gr.HTML(home_html())
+            gr.HTML(home_footer_html())
 
         # ---- TAB: Leaders (the board) ----
         with gr.Tab("Leaders"):
