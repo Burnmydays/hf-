@@ -767,12 +767,12 @@ def _build_demo():
     with _b:
         with gr.Column(elem_id="moses-hero"):
             gr.HTML(
-                "<div style='position: relative; display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 8px 0 12px; border-bottom: 2px solid #C4923A; margin-bottom: 8px;'>"
+                "<div style='position: relative; display: flex; align-items: center; justify-content: space-between; gap: 20px; min-height: 84px; padding: 8px 0 12px; border-bottom: 2px solid #C4923A; margin-bottom: 8px;'>"
                 "  <div style='text-align: left; flex: none;'>"
                 "    <div style='color: #8a7f68; font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 2px;'>Powered by MO\u00a7ES\u2122</div>"
                 "    <h1 style='margin: 0 !important; line-height: 0.9; text-shadow: 0 0 24px rgba(196,146,58,0.25);'>SIGRANK</h1>"
                 "  </div>"
-                "  <div style='position: absolute; left: 50%; transform: translateX(-50%);'><div class='moses-logo'><span class='ml-s'>§</span></div></div>"
+                "  <div style='position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);'><div class='moses-logo'><span class='ml-s'>§</span></div></div>"
                 "  <div style='text-align: right; max-width: 400px; color:#E8E0CF; font-size: 15px; font-weight: 600; line-height: 1.4;'>Ranking AI operators on performance, production, architecture &amp; cost efficiency.</div>"
                 "</div>"
                 "<div style='text-align: center; color:#C4923A; font-size: 14px; font-weight: 700; letter-spacing: 0.02em; margin: 4px 0 10px;'>Identifying Burners, Builders, and 10×ers.</div>"
