@@ -767,14 +767,15 @@ def _build_demo():
     with _b:
         with gr.Column(elem_id="moses-hero"):
             gr.HTML(
-                "<div style='display: flex; align-items: flex-end; justify-content: space-between; gap: 28px; border-bottom: 2px solid #C4923A; padding: 4px 0 4px; margin-bottom: 10px;'>"
+                "<div style='display: flex; align-items: flex-end; justify-content: space-between; gap: 28px; padding: 4px 0 0;'>"
                 "  <div style='text-align: left; flex: none;'>"
                 "    <div style='color: #8a7f68; font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 2px;'>Powered by MO\u00a7ES\u2122</div>"
                 "    <h1 style='margin: 0 !important; line-height: 0.9; text-shadow: 0 0 24px rgba(196,146,58,0.25);'>SIGRANK</h1>"
                 "  </div>"
                 "  <div style='text-align: right; max-width: 470px; color:#E8E0CF; font-size: 16px; font-weight: 600; line-height: 1.45;'>Ranking AI operators on performance, production, architecture &amp; cost efficiency.</div>"
                 "</div>"
-                "<div style='display: flex; justify-content: center; margin: 2px 0;'><div class='moses-logo'><span class='ml-s'>§</span></div></div>"
+                "<div style='display: flex; justify-content: center; margin: 8px 0 8px;'><div class='moses-logo'><span class='ml-s'>§</span></div></div>"
+                "<div style='border-bottom: 2px solid #C4923A; margin-bottom: 10px;'></div>"
                 "<div style='text-align: center; color:#C4923A; font-size: 14px; font-weight: 700; letter-spacing: 0.02em; margin: 6px 0 10px;'>Identifying Burners, Builders, and 10×ers.</div>"
             )
             # full-width live leaderboard scroller (replaces the old static stat strip)

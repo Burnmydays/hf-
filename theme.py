@@ -319,13 +319,13 @@ button.primary:hover, #compute-btn:hover { background: #d8a449 !important; }
 @media (max-width: 700px) { .mx-cols { grid-template-columns: 1fr; } .mx-analogy { font-size: 13px; } }
 
 /* ---------- MO§ES logo (CSS-drawn: gold § in concentric rings on a dark disc) ---------- */
-.moses-logo { position: relative; width: 64px; height: 64px; border-radius: 50%;
+.moses-logo { position: relative; width: 82px; height: 82px; border-radius: 50%;
   background: #0F0D0A; border: 2px solid var(--moses-gold); display: flex;
-  align-items: center; justify-content: center; box-shadow: 0 0 16px rgba(196,146,58,0.4); }
-.moses-logo::before { content: ''; position: absolute; inset: 5px; border-radius: 50%;
+  align-items: center; justify-content: center; box-shadow: 0 0 18px rgba(196,146,58,0.45); }
+.moses-logo::before { content: ''; position: absolute; inset: 6px; border-radius: 50%;
   border: 1px solid rgba(196,146,58,0.4); }
 .ml-s { color: var(--moses-gold); font-family: Georgia, "Times New Roman", serif;
-  font-size: 38px; font-weight: 700; line-height: 1; }
+  font-size: 48px; font-weight: 700; line-height: 1; }
 
 /* ---------- middle nav link (Leaders) emphasized ---------- */
 .tab-container > button:nth-child(3), .tab-nav > button:nth-child(3) {
