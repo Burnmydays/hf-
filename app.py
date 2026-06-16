@@ -53,7 +53,7 @@ def board_html_slim(extra=None):
     ymax = max((m["yield"] for _, m in rows), default=1) or 1
     rows.sort(key=lambda r: r[1]["yield"], reverse=True)
     out = ['<div class="moses-board">']
-    out.append('<div style="display:grid;grid-template-columns:28px 1fr 0.55fr 0.55fr 1.1fr;'
+    out.append('<div class="mb-head" style="display:grid;grid-template-columns:28px 1fr 0.55fr 0.55fr 1.1fr;'
                'align-items:center;gap:8px;padding:8px 10px;'
                'color:#C4923A;font-size:10px;letter-spacing:0.06em;text-transform:uppercase;'
                'border-bottom:1px solid #C4923A;">'

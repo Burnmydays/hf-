@@ -236,12 +236,19 @@ button.primary:hover, #compute-btn:hover { background: #d8a449 !important; }
 footer { display: none !important; }
 
 @media (max-width: 700px) {
+  /* mobile: collapse both boards to rank · operator · Υ. The numeric middle
+     columns drop out entirely instead of being crushed into too-few tracks.
+     !important beats the slim board's inline grid-template-columns. */
   .mb-head, .mb-row {
-    grid-template-columns: 22px 1fr 0.5fr 0.5fr 1fr;
+    grid-template-columns: 22px 1fr 72px !important;
+    gap: 6px !important;
     font-size: 11px;
   }
-  /* hide velocity and leverage columns on mobile */
-  .mb-head span:nth-child(5), .mb-head span:nth-child(6),
-  .mb-row span:nth-child(5), .mb-row span:nth-child(6) { display: none; }
+  .mb-num { display: none !important; }
+  .mb-head span:nth-child(3), .mb-head span:nth-child(4),
+  .mb-row span:nth-child(3), .mb-row span:nth-child(4) { display: none !important; }
+  .mb-op { min-width: 0; overflow-wrap: anywhere; }
+  .mb-raw { font-size: 9px; line-height: 1.35; }
+  .mb-y, .mb-yval { font-size: 11px !important; }
 }
 """
