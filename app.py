@@ -681,13 +681,25 @@ _HOME_SECTIONS = [
 
 def home_html():
     boxes = "".join(
-        f'<div class="hm-box hm-{accent}">{mini()}'
+        f'<div class="hm-box hm-{accent}" data-tab="{t}" role="button" tabindex="0">{mini()}'
         f'<div class="hm-title">◢ {t}</div>'
         f'<div class="hm-sub">{s}</div><div class="hm-desc">{d}</div>'
         f'<div class="hm-cta">open the {t} tab →</div></div>'
         for t, s, d, mini, accent in _HOME_SECTIONS
     )
     return f'<div class="hm-grid">{boxes}</div>'
+
+# Delegated click: clicking a Home mini switches to that tab (Gradio tabs are buttons).
+_TAB_CLICK_JS = """() => {
+  document.addEventListener('click', (e) => {
+    const box = e.target.closest('.hm-box[data-tab]');
+    if (!box) return;
+    const name = (box.getAttribute('data-tab') || '').trim().toUpperCase();
+    const btn = [...document.querySelectorAll('.tab-container button, .tab-nav button')]
+      .find(b => b.textContent.trim().toUpperCase() === name);
+    if (btn) btn.click();
+  });
+}"""
 
 def home_footer_html():
     loom = "https://www.loom.com/share/edc345e2e5164e20aed3acb6436a08c3"
@@ -740,7 +752,8 @@ def _build_demo():
                 "    <div style='color: #8a7f68; font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 2px;'>Powered by MO\u00a7ES\u2122</div>"
                 "    <h1 style='margin: 0 !important; line-height: 0.9; text-shadow: 0 0 24px rgba(196,146,58,0.25);'>SIGRANK</h1>"
                 "  </div>"
-                "  <div style='text-align: right; color: #E8E0CF; font-size: 14px; font-weight: 600; line-height: 1.5; max-width: 440px; padding-top: 34px;'>"
+                "  <div style='flex: none; align-self: center; color: #C4923A; font-size: 52px; font-weight: 800; letter-spacing: -0.1em; line-height: 1; text-shadow: 0 0 22px rgba(196,146,58,0.45); opacity: 0.9;'>§§</div>"
+                "  <div style='text-align: right; color: #E8E0CF; font-size: 14px; font-weight: 600; line-height: 1.5; max-width: 420px; padding-top: 34px;'>"
                 "    Ranking AI operators on performance, production, architecture &amp; cost efficiency. "
                 "    <span style='color:#C4923A;'>Identifying Burners, Builders, and 10\u00d7ers.</span>"
                 "  </div>"
@@ -837,6 +850,7 @@ npx ccusage@latest codex --json
 
         gr.Markdown(elem_id="moses-foot", value="""Four integers in, full ledger out. Architecture is the only variable that matters.
 Wild corpus: tokscale.ai footprints \u00b7 MO\u00a7ES row verified ccusage \u00b7 * = structural estimation.""")
+        _b.load(None, None, None, js=_TAB_CLICK_JS)   # make Home minis clickable \u2192 tab switch
     return _b
 
 demo = _build_demo()

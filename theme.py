@@ -90,8 +90,10 @@ button.primary:hover, #compute-btn:hover { background: #d8a449 !important; }
 
 /* Structural Board Alignment Layout */
 .moses-board { font-family: ui-monospace, monospace; margin-top: 6px; width: 100% !important; box-sizing: border-box !important; }
-.mb-head, .mb-row { display: grid; grid-template-columns: 26px 0.95fr 0.5fr 0.55fr 0.5fr 0.55fr 0.5fr 0.9fr 1.5fr;
+.mb-head, .mb-row { display: grid; grid-template-columns: 26px 1.35fr 0.48fr 0.5fr 0.48fr 0.5fr 0.48fr 0.85fr 1.65fr;
   align-items: center; gap: 8px; padding: 7px 12px; width: 100%; box-sizing: border-box; }
+.mb-row b { font-size: 12px !important; }
+.mb-op b { white-space: nowrap; }
 .mb-ledger { color: #7a7060; font-size: 10px; font-family: ui-monospace, monospace; text-align: right;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border-left: 1px solid #2c2718; padding-left: 8px; }
 .mb-head .mb-ledger { color: #C4923A; }
@@ -170,7 +172,7 @@ button.primary:hover, #compute-btn:hover { background: #d8a449 !important; }
 .pm-lev  { color: var(--moses-dim); font-size: 10px; }
 
 .hm-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.hm-box { border: 1px solid var(--moses-line); border-radius: 6px; background: var(--moses-card);
+.hm-box { cursor: pointer; border: 1px solid var(--moses-line); border-radius: 6px; background: var(--moses-card);
   padding: 16px 18px; transition: border-color 0.12s ease, background 0.12s ease; }
 .hm-box:hover { border-color: var(--moses-gold); background: rgba(196,146,58,0.06); }
 .hm-title { color: var(--moses-gold); font-size: 15px; font-weight: 800; letter-spacing: 0.04em; }
