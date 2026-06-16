@@ -144,23 +144,26 @@ def board_html(extra=None, sort_key="yield"):
 
 # raw token pillars: I=input  O=output  Cw=cache-create  Cr=cache-read
 _METRIC_KEY = [
-    ("\u03a5 yield", "(Cr\u00b7O) / I\u00b2", "leverage \u00d7 velocity",
-     "The rank metric. Rewards architecture \u2014 reused context (Cr) and produced signal (O) "
-     "measured against fresh input (I). Squaring I is why raw volume can't buy rank."),
+    ("\u03a5 yield", "(Cache \u00b7 Output) / Input\u00b2", "the main efficiency score",
+     "How well you reuse stored info (cache) to produce strong output while keeping new "
+     "input low. Squaring input heavily penalizes wasted tokens \u2014 a high \u03a5 means you're "
+     "getting value from smart reuse, not just throwing more data at the model."),
     ("SNR", "O / (I+O)", "signal-to-noise",
-     "Share of the exchange that is model-generated signal vs. human/system input. "
-     "\u22650.84 = TRANSMITTER class."),
-    ("10x DEV", "log\u2081\u2080(transmission \u00d7 commitment \u00d7 reuse)", "= log\u2081\u2080(leverage)",
-     "The cascade in orders of magnitude \u2014 the \u201810^x\u2019 developer multiplier. "
-     "(O/I)\u00b7(Cw/O)\u00b7(Cr/Cw) telescopes to Cr/I, so this is literally log\u2081\u2080 of leverage."),
+     "How much useful, meaningful output (signal) you get versus repetitive or low-value "
+     "fluff (noise). Rewards clean, focused generations over long, rambling ones."),
+    ("leverage", "Cr / I", "cache leverage",
+     "How effectively you reuse previously computed results (cache-read) instead of "
+     "recomputing from fresh input. Big \u2018free\u2019 value from smart memory \u2014 the core "
+     "architectural signal that separates a compounding cache from a stateless pipe."),
     ("velocity", "O / I", "throughput",
-     "Output produced per input token spent. Single-pass processing speed."),
-    ("leverage", "Cr / I", "reuse amplification",
-     "How many times context is re-read (cache-read) per fresh input token. "
-     "The core architectural signal \u2014 high leverage = a compounding cache, not a stateless pipe."),
+     "Output produced per input token spent \u2014 single-pass processing speed."),
+    ("10x DEV", "log\u2081\u2080(transmission \u00d7 commitment \u00d7 reuse)", "cascade velocity",
+     "How efficiently the run chains steps together \u2014 the 10\u00d710\u00d720 cascade. The three "
+     "factors telescope to Cr/I, so this is the cascade expressed in orders of magnitude "
+     "(log\u2081\u2080 of leverage). Smoother chaining = higher."),
     ("$/1M", "blended cost / 1M tokens", "across all states",
-     "Average cost per million tokens across input, output, and cache. "
-     "Efficient architecture is also the cheapest. ~ = recomputed at list price."),
+     "Average cost per million tokens across input, output, and cache. Efficient "
+     "architecture is also the cheapest. ~ = recomputed at list price."),
 ]
 
 def metrics_key_html():
