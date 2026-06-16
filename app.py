@@ -369,9 +369,9 @@ def run_ingest(blob, name, request: gr.Request):
                 "`ccusage codex --json` output, or `ccusage --json` "
                 "for all providers. You can also paste four numbers: "
                 "input output cache_create cache_read.\n\n"
-                f"_parser said: {e}_"), "", "", "", board_html()
+                f"_parser said: {e}_"), "", "", ""
     if i+o+cw+cr==0:
-        return "Got zeros \u2014 check your paste.", "", "", "", board_html()
+        return "Got zeros \u2014 check your paste.", "", "", ""
     m=compute(i,o,cw,cr, cost_usd=meta.get("cost"))
     if meta.get("estimated"):
         m["_caveat"]=meta.get("caveat")
@@ -403,8 +403,7 @@ def run_ingest(blob, name, request: gr.Request):
     return (profile,
             comp_bar_html(m["composition"]),
             card_html(name,m,rank,len(rows),read),
-            hits_html,
-            board_html_slim((name,m)))
+            hits_html)
 
 # ---------- interactive leaderboard helpers ----------
 def resort_board(label):
@@ -412,16 +411,47 @@ def resort_board(label):
     return board_html(sort_key=SORT_LABELS.get(label, "yield"))
 
 def view_operator(name):
-    """Render a corpus operator's full profile + share card (the 'open a profile' picker)."""
+    """Render a corpus operator's full profile + share card + learn-from insights."""
     ops = operators()
     if not name or name not in ops:
-        return "", ""
+        return "", "", ""
     m = compute(*ops[name])
     rows = sorted(((n, compute(*v)) for n, v in ops.items()),
                   key=lambda r: r[1]["yield"], reverse=True)
     rank = next(i for i, (n, _) in enumerate(rows, 1) if n == name)
     read = narrate(name, m, classify(m))
-    return profile_md(name, m, rank, len(rows), read), card_html(name, m, rank, len(rows), read)
+    return (profile_md(name, m, rank, len(rows), read),
+            card_html(name, m, rank, len(rows), read),
+            insights_html(name, m))
+
+def insights_html(name, m):
+    """Reader takeaways: what this operator does well + what to avoid."""
+    good, avoid = [], []
+    lev, snr, vel = m["leverage"], m["snr"], m["velocity"]
+    if lev >= 100:   good.append("Exceptional cache reuse — context is re-read, not rebuilt each turn.")
+    elif lev >= 10:  good.append("Solid cache leverage — compounding on prior work.")
+    else:            avoid.append("Low cache leverage — mostly fresh input each turn (recompute waste).")
+    if snr >= 0.5:   good.append("High signal — most tokens are model output, not prompt bloat.")
+    else:            avoid.append("Low signal-to-noise — large input vs. output; tighten prompts.")
+    if m["non_compounding"]: avoid.append("No cache-create — stateless pipe, no architectural compounding.")
+    else:            good.append("Compounding architecture — building reusable context, not one-shotting.")
+    if vel >= 1:     good.append("Strong throughput — produces more than it consumes.")
+    elif vel < 0.3:  avoid.append("Low velocity — heavy input for little output.")
+    g = "".join(f"<li>{x}</li>" for x in good) or "<li>—</li>"
+    a = "".join(f"<li>{x}</li>" for x in avoid) or "<li>Nothing major — clean architecture.</li>"
+    return (f'<div class="ins-wrap">'
+            f'<div class="ins-block ins-good"><div class="ins-h">✓ Doing well</div><ul>{g}</ul></div>'
+            f'<div class="ins-block ins-avoid"><div class="ins-h">✕ Watch out</div><ul>{a}</ul></div></div>')
+
+def operator_segments():
+    """Live counts: burners (spend, no reuse), builders (compounding), 10×ers (elite reuse)."""
+    burn = build = tenx = 0
+    for v in operators().values():
+        lev = compute(*v)["leverage"]
+        if lev < 2:        burn += 1
+        elif lev >= 1000:  tenx += 1
+        else:              build += 1
+    return burn, build, tenx, burn + build + tenx
 
 # ---------- VS / compare ----------
 # (label, metrics key, winner = max|min, value formatter)
@@ -477,22 +507,48 @@ def profile_marquee_html():
     return f'<div class="pm-wrap"><div class="pm-track">{chips}{chips}</div></div>'
 
 # ---- the metric standard (green feature row) ----
+# (symbol, metrics key, equation, value-format, hover description)
 _FEATURE_METRICS = [
-    ("Υ", "(Cache·Output)/Input²", "the efficiency score"),
-    ("SNR", "Out/(In+Out)", "signal vs noise"),
-    ("10x DEV", "log₁₀ cascade", "amplification decades"),
-    ("$/1M", "blended cost", "efficiency = cheapest"),
+    ("Υ", "yield", "(Cache·Output) / Input²", "{v:,.0f}",
+     "The efficiency score. Reused context (cache) × produced output, measured against "
+     "fresh input squared — squaring input is why raw volume can't buy rank."),
+    ("SNR", "snr", "Out / (In+Out)", "{v:.2f}",
+     "Signal-to-noise. Share of the exchange that's model output vs. prompt/input. "
+     "Higher = focused, less bloat."),
+    ("10x", "dev10x", "log₁₀(cascade)", "{v:.2f}",
+     "The cascade in orders of magnitude (log₁₀ of leverage) — the 10× developer multiplier."),
+    ("$/1M", "avg_cost_1m", "blended cost / 1M", "${v}",
+     "Blended cost per million tokens across all states. Efficient architecture is also "
+     "the cheapest — so cost falls out of good design."),
 ]
 
+def _corpus_metric_values(key):
+    vals = [compute(*v).get(key) for v in operators().values()]
+    return sorted(x for x in vals if x is not None)
+
+def _median(vals):
+    n = len(vals)
+    if not n: return 0
+    return vals[n // 2] if n % 2 else (vals[n // 2 - 1] + vals[n // 2]) / 2
+
 def metric_features_html():
-    boxes = "".join(
-        f'<div class="mf-box"><div class="mf-sym">{s}</div>'
-        f'<div class="mf-form">{f}</div><div class="mf-tag">{t}</div></div>'
-        for s, f, t in _FEATURE_METRICS
-    )
+    boxes = []
+    for sym, key, form, fmt, desc in _FEATURE_METRICS:
+        vals = _corpus_metric_values(key)
+        med = _median(vals); avg = sum(vals) / len(vals) if vals else 0
+        if key == "avg_cost_1m":
+            stat = f"med ${_fmt_cost(med)} · avg ${_fmt_cost(avg)}"
+        else:
+            stat = f"med {fmt.format(v=med)} · avg {fmt.format(v=avg)}"
+        boxes.append(
+            f'<div class="mf-box" tabindex="0"><div class="mf-sym">{sym}</div>'
+            f'<div class="mf-form">{form}</div>'
+            f'<div class="mf-stat">{stat}</div>'
+            f'<div class="mf-tip">{desc}</div></div>')
     return ('<div class="mf-head">Introducing the new standard in '
             '<span>AI metrics &amp; benchmarks</span></div>'
-            f'<div class="mf-grid">{boxes}</div>')
+            f'<div class="mf-grid">{"".join(boxes)}</div>'
+            '<div class="mf-sub">hover any metric for what it means · med/avg across the live field</div>')
 
 # ---- real mini renders of each page (live HTML, scaled into a framed thumbnail) ----
 def _top_rows(n):
@@ -591,19 +647,25 @@ def _build_demo():
     _names = list(_ops_now.keys())
     _ys = sorted((compute(*v)["yield"] for v in _ops_now.values()), reverse=True)
     _lead = (_ys[0] / _ys[1]) if len(_ys) > 1 and _ys[1] > 0 else 0.0
+    _burn, _build, _tenx, _tot = operator_segments()
     with _b:
         with gr.Column(elem_id="moses-hero"):
             gr.HTML(
-                "<div style='display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #C4923A; padding-bottom: 10px; margin-bottom: 12px;'>"
+                "<div style='display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #C4923A; padding-bottom: 10px; margin-bottom: 10px; gap: 20px;'>"
                 "  <div>"
                 "    <div style='color: #8a7f68; font-size: 10px; letter-spacing: 0.28em; text-transform: uppercase; margin-bottom: 2px;'>Powered by MO\u00a7ES\u2122</div>"
-                "    <h1 style='color: #C4923A !important; font-size: 44px !important; font-weight: 800 !important; letter-spacing: 0.18em !important; margin: 0 !important; line-height: 1.0;'>SIGRANK</h1>"
-                "    <p style='color: #E8E0CF !important; font-size: 13.5px !important; letter-spacing: 0.01em !important; margin: 7px 0 0 0 !important; font-weight: 600; max-width: 620px; line-height: 1.4;'>Ranking AI operators on performance, production, architecture &amp; cost efficiency \u2014 turning noise into signal to show <span style='color:#C4923A;'>who's building vs who's burning.</span></p>"
+                "    <h1 style='color: #C4923A !important; font-size: 58px !important; font-weight: 800 !important; letter-spacing: 0.16em !important; margin: 0 !important; line-height: 0.95; text-shadow: 0 0 24px rgba(196,146,58,0.25);'>SIGRANK</h1>"
+                "    <p style='color: #E8E0CF !important; font-size: 13.5px !important; letter-spacing: 0.01em !important; margin: 8px 0 0 0 !important; font-weight: 600; max-width: 640px; line-height: 1.45;'>Ranking AI operators on performance, production, architecture &amp; cost efficiency. <span style='color:#C4923A;'>Identifying Burners, Builders, and 10\u00d7ers.</span></p>"
                 "  </div>"
-                "  <div style='text-align: right; font-size: 10px; color: #8a7f68; letter-spacing: 0.1em; line-height: 1.4; font-weight: bold; white-space: nowrap;'>"
-                "    SYSTEM STATUS: <span style='color: #22c55e;'>ONLINE</span><br>"
-                "    METRIC VECTOR: <span style='color: #C4923A;'>\u03a5 = (C\u00b7O)/I\u00b2</span>"
-                "  </div>"
+                f"  <div class='hero-stat'>"
+                f"    <div class='hs-row'>TRANSMISSION STATUS <span style='color:#22c55e;'>\u25cf ONLINE</span></div>"
+                f"    <div class='hs-row'>METRIC VECTOR <span style='color:#C4923A;'>\u03a5 = (C\u00b7O)/I\u00b2</span></div>"
+                f"    <div class='hs-div'></div>"
+                f"    <div class='hs-row'>BURNERS <span class='hs-burn'>{_burn:03d}</span></div>"
+                f"    <div class='hs-row'>BUILDERS <span class='hs-build'>{_build:03d}</span></div>"
+                f"    <div class='hs-row'>10\u00d7ERS <span class='hs-tenx'>{_tenx:03d}</span></div>"
+                f"    <div class='hs-row'>TOTAL SIGNALS <span style='color:#E8E0CF;'>{_tot:03d}</span></div>"
+                f"  </div>"
                 "</div>"
             )
             # full-width live leaderboard scroller (replaces the old static stat strip)
@@ -614,35 +676,6 @@ def _build_demo():
             gr.HTML(metric_features_html())
             gr.HTML(home_html())
             gr.HTML(home_footer_html())
-
-        # ---- TAB: Leaders (the board) ----
-        with gr.Tab("Leaders"):
-            gr.Markdown("**The ledger doesn't care what you claim.** Ranked by **\u03a5 = (Cache\u00b7Output)/Input\u00b2** \u2014 raw Read\u00b7Create\u00b7In\u00b7Out stacked under each operator. $/1M is blended cost; efficient architecture is also the cheapest.")
-            rank_by = gr.Radio(list(SORT_LABELS.keys()), value="\u03a5 yield",
-                               label="Rank by", elem_id="rank-by")
-            lb = gr.HTML(board_html())
-            rank_by.change(resort_board, rank_by, lb)
-            gr.HTML(metrics_key_html())
-            gr.Markdown("*Curated corpus \u00b7 pasting scores you live but isn't persisted unless you sign in \u00b7 $/1M is a list-price recompute (~) \u00b7 \\* = structural estimation.*", elem_id="moses-foot")
-
-        # ---- TAB: Reports (operator profile inspector) ----
-        with gr.Tab("Reports"):
-            gr.Markdown("### Full architectural read on any operator\nPick a name to pull their complete profile and a shareable operator card.")
-            with gr.Row():
-                with gr.Column(scale=5):
-                    op_pick = gr.Dropdown(_names, label="Operator", value=None, elem_id="op-pick")
-                    op_card = gr.HTML(CARD_PLACEHOLDER)
-                with gr.Column(scale=6):
-                    op_prof = gr.Markdown(elem_id="moses-profile")
-            op_pick.change(view_operator, op_pick, [op_prof, op_card])
-
-        # ---- TAB: VS (head-to-head compare) ----
-        with gr.Tab("VS"):
-            gr.Markdown("### Put operators head-to-head\nSelect 2\u20133 operators. Gold cell wins each metric. **This is where architecture beats budget in plain sight.**")
-            cmp_pick = gr.Dropdown(_names, label="Operators (pick 2\u20133)", value=None,
-                                   multiselect=True, max_choices=3, elem_id="cmp-pick")
-            cmp_out = gr.HTML(compare_html(None))
-            cmp_pick.change(compare_html, cmp_pick, cmp_out)
 
         # ---- TAB: Create (clock your signal \u2014 the importer) ----
         with gr.Tab("Create"):
@@ -675,8 +708,8 @@ npx ccusage@latest codex --json
                     blob = gr.Textbox(label="ccusage JSON \u2014or\u2014 four numbers (I O C R)", lines=5,
                                       placeholder='Paste ccusage JSON here\n\nor four numbers: input output cache_create cache_read\n\nExample: 1251211 11296121 128196310 2555179769')
                     go = gr.Button("Clock My Signal", variant="primary", elem_id="compute-btn")
-                    gr.Markdown("### Your live board placement")
-                    ob = gr.HTML(board_html_slim())
+                    gr.Markdown("### What the metrics mean")
+                    gr.HTML(metrics_key_html())
                     gr.Markdown("### Greatest hits")
                     hits = gr.HTML()
                 with gr.Column(scale=6):
@@ -685,7 +718,7 @@ npx ccusage@latest codex --json
                     gr.Markdown("*Right-click \u2192 Save image to share your architectural footprint.*", elem_id="moses-foot")
                     prof_bar = gr.HTML()
                     prof = gr.Markdown(elem_id="moses-profile")
-            go.click(run_ingest, [blob, nm], [prof, prof_bar, card, hits, ob])
+            go.click(run_ingest, [blob, nm], [prof, prof_bar, card, hits])
             gr.Examples(
                 examples=[
                     ['{"totals":{"inputTokens":1251211,"outputTokens":11296121,"cacheCreationTokens":128196310,"cacheReadTokens":2555179769}}','MO\u00a7ES'],
@@ -693,6 +726,36 @@ npx ccusage@latest codex --json
                     ['1251211 11296121 128196310 2555179769', 'manual-paste'],
                 ],
                 inputs=[blob, nm])
+
+        # ---- TAB: Leaders (the board) ----
+        with gr.Tab("Leaders"):
+            gr.Markdown("**The ledger doesn't care what you claim.** Ranked by **\u03a5 = (Cache\u00b7Output)/Input\u00b2** \u2014 raw Read\u00b7Create\u00b7In\u00b7Out stacked under each operator. $/1M is blended cost; efficient architecture is also the cheapest.")
+            rank_by = gr.Radio(list(SORT_LABELS.keys()), value="\u03a5 yield",
+                               label="Rank by", elem_id="rank-by")
+            lb = gr.HTML(board_html())
+            rank_by.change(resort_board, rank_by, lb)
+            gr.HTML(metrics_key_html())
+            gr.Markdown("*Curated corpus \u00b7 pasting scores you live but isn't persisted unless you sign in \u00b7 $/1M is a list-price recompute (~) \u00b7 \\* = structural estimation.*", elem_id="moses-foot")
+
+        # ---- TAB: VS (head-to-head compare) ----
+        with gr.Tab("VS"):
+            gr.Markdown("### Put operators head-to-head\nSelect 2\u20133 operators. Gold cell wins each metric. **This is where architecture beats budget in plain sight.**")
+            cmp_pick = gr.Dropdown(_names, label="Operators (pick 2\u20133)", value=None,
+                                   multiselect=True, max_choices=3, elem_id="cmp-pick")
+            cmp_out = gr.HTML(compare_html(None))
+            cmp_pick.change(compare_html, cmp_pick, cmp_out)
+
+        # ---- TAB: Reports (operator profile inspector) ----
+        with gr.Tab("Reports"):
+            gr.Markdown("### Full architectural read on any operator\nPick a name to pull their complete profile, a shareable card, and **what to learn from them**.")
+            with gr.Row():
+                with gr.Column(scale=5):
+                    op_pick = gr.Dropdown(_names, label="Operator", value=None, elem_id="op-pick")
+                    op_card = gr.HTML(CARD_PLACEHOLDER)
+                with gr.Column(scale=6):
+                    op_prof = gr.Markdown(elem_id="moses-profile")
+                    op_insights = gr.HTML()
+            op_pick.change(view_operator, op_pick, [op_prof, op_card, op_insights])
 
         gr.Markdown(elem_id="moses-foot", value="""Four integers in, full ledger out. Architecture is the only variable that matters.
 Wild corpus: tokscale.ai footprints \u00b7 MO\u00a7ES row verified ccusage \u00b7 * = structural estimation.""")

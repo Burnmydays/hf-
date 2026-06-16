@@ -253,6 +253,41 @@ button.primary:hover, #compute-btn:hover { background: #d8a449 !important; }
 .cr-btn { background: var(--moses-gold); color: var(--moses-bg); text-align: center;
   padding: 10px; border-radius: 5px; font-weight: 800; }
 .cr-res { color: var(--moses-gold); margin-top: 10px; font-weight: 800; text-align: center; }
+
+/* ---------- middle nav link (Leaders) emphasized ---------- */
+.tab-container > button:nth-child(3), .tab-nav > button:nth-child(3) {
+  color: var(--moses-gold) !important; font-size: 17px !important; font-weight: 800 !important;
+  text-shadow: 0 0 14px rgba(196,146,58,0.4); }
+
+/* ---------- hero status + live counters (top-right) ---------- */
+.hero-stat { text-align: right; font-size: 10px; letter-spacing: 0.06em; line-height: 1.65;
+  font-weight: 700; color: var(--moses-dim); white-space: nowrap; min-width: 196px; }
+.hs-row { display: flex; justify-content: space-between; gap: 16px; }
+.hs-div { height: 1px; background: var(--moses-line); margin: 5px 0; }
+.hs-burn { color: #ef6b6b; } .hs-build { color: #4ade80; } .hs-tenx { color: var(--moses-gold); }
+@media (max-width: 700px) { .hero-stat { display: none; } }
+
+/* ---------- equation boxes: median/avg + hover description ---------- */
+.mf-box { position: relative; cursor: help; }
+.mf-stat { color: var(--moses-dim); font-size: 9.5px; margin-top: 5px; letter-spacing: 0.02em; }
+.mf-tip { position: absolute; left: 50%; bottom: calc(100% + 8px); transform: translateX(-50%);
+  width: 220px; max-width: 70vw; background: #0f0d0a; color: var(--moses-ink);
+  border: 1px solid var(--moses-gold); border-radius: 6px; padding: 10px 12px; font-size: 11px;
+  line-height: 1.45; text-align: left; opacity: 0; visibility: hidden; transition: opacity 0.15s ease;
+  z-index: 60; box-shadow: 0 8px 24px rgba(0,0,0,0.6); }
+.mf-box:hover .mf-tip, .mf-box:focus .mf-tip { opacity: 1; visibility: visible; }
+.mf-sub { text-align: center; color: var(--moses-dim); font-size: 10px; margin: -4px 0 14px; }
+
+/* ---------- reports: learn-from insights ---------- */
+.ins-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
+.ins-block { border: 1px solid var(--moses-line); border-radius: 6px; padding: 12px 14px; }
+.ins-good { border-left: 3px solid #4ade80; background: rgba(34,197,94,0.05); }
+.ins-avoid { border-left: 3px solid #ef6b6b; background: rgba(239,107,107,0.05); }
+.ins-h { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 800; margin-bottom: 6px; }
+.ins-good .ins-h { color: #4ade80; } .ins-avoid .ins-h { color: #ef6b6b; }
+.ins-block ul { margin: 0; padding-left: 16px; }
+.ins-block li { color: var(--moses-dim); font-size: 11.5px; line-height: 1.5; margin-bottom: 4px; }
+@media (max-width: 700px) { .ins-wrap { grid-template-columns: 1fr; } }
 .mb-foot { color: #5f573f; font-size: 10.5px; padding: 10px 8px 0; line-height: 1.6; }
 
 /* composition bar */
