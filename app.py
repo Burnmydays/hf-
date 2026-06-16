@@ -602,6 +602,19 @@ def _median(vals):
     if not n: return 0
     return vals[n // 2] if n % 2 else (vals[n // 2 - 1] + vals[n // 2]) / 2
 
+def _status_box_html():
+    """Live system status + segment counters — rendered as a metric box."""
+    burn, build, tenx, tot = operator_segments()
+    return (
+        '<div class="mf-box mf-status">'
+        '<div class="ms-title"><span class="ms-dot">●</span> ONLINE</div>'
+        '<div class="ms-grid">'
+        f'<span>BURNERS</span><span class="hs-burn">{burn:03d}</span>'
+        f'<span>BUILDERS</span><span class="hs-build">{build:03d}</span>'
+        f'<span>10×ERS</span><span class="hs-tenx">{tenx:03d}</span>'
+        f'<span>SIGNALS</span><span class="ms-tot">{tot:03d}</span>'
+        '</div></div>')
+
 def metric_features_html():
     boxes = []
     for sym, key, form, fmt, desc in _FEATURE_METRICS:
@@ -613,10 +626,11 @@ def metric_features_html():
             f'<div class="mf-big">{big}</div>'
             f'<div class="mf-form">{form}</div>'
             f'<div class="mf-tip">{desc}</div></div>')
+    boxes.insert(2, _status_box_html())   # between SNR and 10x
     return ('<div class="mf-head">Introducing the new standard in '
             '<span>AI metrics &amp; benchmarks</span></div>'
             f'<div class="mf-grid">{"".join(boxes)}</div>'
-            '<div class="mf-sub">field average · hover any metric for what it means</div>')
+            '<div class="mf-sub">field average · live counts · hover any metric for what it means</div>')
 
 # ---- real mini renders of each page (live HTML, scaled into a framed thumbnail) ----
 def _top_rows(n):
@@ -719,21 +733,15 @@ def _build_demo():
     with _b:
         with gr.Column(elem_id="moses-hero"):
             gr.HTML(
-                "<div style='position: relative; text-align: center; border-bottom: 2px solid #C4923A; padding-bottom: 10px; margin-bottom: 10px;'>"
-                "  <div style='display: inline-block; text-align: center;'>"
-                "    <div style='color: #8a7f68; font-size: 10px; letter-spacing: 0.28em; text-transform: uppercase; margin-bottom: 2px;'>Powered by MO\u00a7ES\u2122</div>"
-                "    <h1 style='margin: 0 !important; line-height: 0.95; text-shadow: 0 0 24px rgba(196,146,58,0.25);'>SIGRANK</h1>"
-                "    <p style='color: #E8E0CF !important; font-size: 13.5px !important; letter-spacing: 0.01em !important; margin: 8px auto 0 !important; font-weight: 600; max-width: 640px; line-height: 1.45;'>Ranking AI operators on performance, production, architecture &amp; cost efficiency. <span style='color:#C4923A;'>Identifying Burners, Builders, and 10\u00d7ers.</span></p>"
+                "<div style='display: flex; align-items: center; justify-content: space-between; gap: 28px; border-bottom: 2px solid #C4923A; padding-bottom: 12px; margin-bottom: 10px;'>"
+                "  <div style='text-align: left; flex: none;'>"
+                "    <div style='color: #8a7f68; font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 2px;'>Powered by MO\u00a7ES\u2122</div>"
+                "    <h1 style='margin: 0 !important; line-height: 0.9; text-shadow: 0 0 24px rgba(196,146,58,0.25);'>SIGRANK</h1>"
                 "  </div>"
-                f"  <div class='hero-stat' style='position: absolute; top: 0; right: 0;'>"
-                f"    <div class='hs-row'>TRANSMISSION STATUS <span style='color:#22c55e;'>\u25cf ONLINE</span></div>"
-                f"    <div class='hs-row'>METRIC VECTOR <span style='color:#C4923A;'>\u03a5 = (C\u00b7O)/I\u00b2</span></div>"
-                f"    <div class='hs-div'></div>"
-                f"    <div class='hs-row'>BURNERS <span class='hs-burn'>{_burn:03d}</span></div>"
-                f"    <div class='hs-row'>BUILDERS <span class='hs-build'>{_build:03d}</span></div>"
-                f"    <div class='hs-row'>10\u00d7ERS <span class='hs-tenx'>{_tenx:03d}</span></div>"
-                f"    <div class='hs-row'>TOTAL SIGNALS <span style='color:#E8E0CF;'>{_tot:03d}</span></div>"
-                f"  </div>"
+                "  <div style='text-align: right; color: #E8E0CF; font-size: 14px; font-weight: 600; line-height: 1.5; max-width: 460px;'>"
+                "    Ranking AI operators on performance, production, architecture &amp; cost efficiency. "
+                "    <span style='color:#C4923A;'>Identifying Burners, Builders, and 10\u00d7ers.</span>"
+                "  </div>"
                 "</div>"
             )
             # full-width live leaderboard scroller (replaces the old static stat strip)

@@ -28,8 +28,8 @@ CSS = """
 .tab-wrapper { margin: 0 0 2px 0 !important; padding: 0 !important; }
 #moses-hero h1 {
   color: var(--moses-gold) !important;
-  font-size: 58px !important;
-  letter-spacing: 0.16em !important;
+  font-size: 66px !important;
+  letter-spacing: 0.14em !important;
   font-weight: 800 !important;
   margin: 0 !important;
 }
@@ -182,7 +182,16 @@ button.primary:hover, #compute-btn:hover { background: #d8a449 !important; }
   letter-spacing: 0.01em; margin: 0 0 14px; line-height: 1.2; }
 .mf-head span { color: var(--moses-gold); text-shadow: 0 0 18px rgba(196,146,58,0.35); }
 @media (max-width: 700px) { .mf-head { font-size: 20px; } }
-.mf-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
+.mf-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 14px; }
+/* live-status box (sits between SNR and 10x) */
+.mf-status { text-align: left; }
+.ms-title { color: #4ade80; font-size: 12px; font-weight: 800; letter-spacing: 0.06em;
+  text-transform: uppercase; margin-bottom: 8px; }
+.ms-dot { color: #22c55e; }
+.ms-grid { display: grid; grid-template-columns: 1fr auto; gap: 3px 8px; font-size: 11px; align-items: baseline; }
+.ms-grid > span:nth-child(odd) { color: var(--moses-dim); text-transform: uppercase; letter-spacing: 0.03em; }
+.ms-grid > span:nth-child(even) { text-align: right; font-weight: 800; }
+.ms-tot { color: var(--moses-ink); }
 .mf-box { border: 1px solid var(--moses-gold); border-radius: 6px; background: rgba(196,146,58,0.06);
   padding: 12px; text-align: center; }
 .mf-sym { color: var(--moses-dim); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; }
