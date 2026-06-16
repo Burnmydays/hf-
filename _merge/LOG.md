@@ -32,10 +32,40 @@
 - [ ] HF Spaces secrets still need to be set (SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_KEY) — see SCRATCHPAD.md BLOCKED ON OWNER section
 - [ ] Confirm Founder tier cap (how many slots before closing?)
 - [ ] When to reach out to tokscale.ai / ccusage — after first live operators, or at launch?
-- [ ] The "locate Transmitters" vision — does this mean: (a) public discovery page where anyone can find the highest-class operators in their domain, (b) a notification/alert system ("a new TRANSMITTER emerged"), or (c) something else?
+- [x] The "locate Transmitters" vision — ANSWERED: goal is to unify people and locate Transmitters. See architecture decision below.
+
+---
+
+## Architecture Decision — "Locate Transmitters" (2026-06-16)
+
+**Owner confirmed:** The ultimate goal of SigRank is to unify people and locate Transmitters. This is the thesis, not a feature.
+
+**What this requires (resolved):**
+
+1. **`/transmitters` discovery page** — K.01-only filtered leaderboard view. Filterable by platform, domain, circle. CTA = "Challenge" → `/compare?a={codename}&b=you`. This is BlitzStars `/topplayers` but gated to TRANSMITTER class.
+
+2. **Domain tags on operator profiles** — free text + preset tags (code / legal / creative / research / multi). One DB column (`operator_domains TEXT[]`) that unlocks the entire discovery dimension. Without domain tags, a TRANSMITTER is a number. With them, they're findable.
+
+3. **Class-promotion events** — when RS.07 stickiness fires and a promotion to TRANSMITTER completes, it's a DB state change. That change powers: homepage feed ("A new TRANSMITTER emerged"), circle notifications, webhook. No streaming required — Supabase realtime on `class_tier` column → Next.js `useChannel()` → homepage live feed.
+
+4. **Weekly Drop Window** (the live event that bolts on):
+   - Mon 00:00–Fri 23:59 UTC: submission window open
+   - Sat 00:00 UTC: window closes
+   - Sat 12:00 UTC: scoring cron runs (`app/api/cron/weekly-drop/route.ts` on Vercel)
+   - Sat 13:00 UTC: leaderboard updates atomically, class changes fire as events
+   - This is the "live event" — a data event, not streaming infrastructure
+
+**Build position:** Phase 3.5 (between real seed data and trading cards). Requires:
+- `operator_domains` column in DB schema
+- `/transmitters` page (~1 page component)
+- `app/api/cron/weekly-drop/route.ts` (Vercel cron)
+- Supabase realtime subscription on `class_tier` in the homepage component
+
+**This is what makes SigRank a social product, not just a stats tracker.**
 
 ---
 
 <!-- POST-COMMIT HOOK APPENDS BELOW THIS LINE -->
+[HOOK] 2026-06-16 14:23 UTC · ceccb77 · Burnmydays · feat: _merge/ workspace — README, LOG, post-commit hook
 <!-- Format: `[HOOK] {timestamp} {hash} {subject}` -->
 
