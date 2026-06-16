@@ -89,8 +89,9 @@ button.primary:hover, #compute-btn:hover { background: #d8a449 !important; }
 #moses-foot { border-top: 1px solid var(--moses-line); padding-top: 10px; margin-top: 16px; line-height: 1.7; }
 
 /* Structural Board Alignment Layout */
-.moses-board { font-family: ui-monospace, monospace; margin-top: 6px; width: 100% !important; box-sizing: border-box !important; }
-.mb-head, .mb-row { display: grid; grid-template-columns: 26px 1.3fr 0.45fr 0.5fr 0.45fr 0.5fr 0.45fr 0.5fr 1.7fr;
+.moses-board { font-family: ui-monospace, monospace; margin-top: 6px; width: 100% !important; box-sizing: border-box !important;
+  border: 1px solid var(--moses-line); border-radius: 8px; overflow: hidden; }
+.mb-head, .mb-row { display: grid; grid-template-columns: 26px 1.5fr 0.5fr 0.55fr 0.5fr 0.55fr 0.5fr 0.6fr 0.85fr;
   align-items: center; gap: 8px; padding: 7px 12px; width: 100%; box-sizing: border-box; }
 .mb-head > span, .mb-row > span { min-width: 0; }   /* let cells shrink so nothing overflows */
 .mb-row b { font-size: 12px !important; }
@@ -460,10 +461,11 @@ button.primary:hover, #compute-btn:hover { background: #d8a449 !important; }
 
 /* "Rank by" radio -> horizontal pill / segmented control (not a gray form) */
 #rank-by { border: none !important; background: transparent !important; padding: 0 !important; }
-#rank-by .wrap { display: flex !important; flex-wrap: wrap; gap: 6px; }
+#rank-by .wrap { display: flex !important; flex-wrap: wrap; gap: 6px; justify-content: center !important; }
 #rank-by .wrap label {
+  flex: 1 1 0; max-width: 150px; text-align: center;
   background: var(--moses-card); border: 1px solid var(--moses-line);
-  border-radius: 16px; padding: 4px 12px; color: var(--moses-dim);
+  border-radius: 16px; padding: 5px 12px; color: var(--moses-dim);
   font-size: 11px; cursor: pointer; margin: 0 !important; }
 #rank-by .wrap label.selected, #rank-by .wrap label:has(input:checked) {
   border-color: var(--moses-gold) !important; color: var(--moses-gold) !important;

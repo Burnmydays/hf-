@@ -125,7 +125,7 @@ def board_html(extra=None, sort_key="yield"):
                '<span class="mb-num">velocity</span><span class="mb-num">leverage</span>'
                '<span class="mb-num">$/1M</span>'
                '<span class="mb-y">\u03a5 yield</span>'
-               '<span class="mb-ledger">ledger \u00b7 R\u00b7C\u00b7I\u00b7O\u00b7\u03a3</span></div>')
+               '<span class="mb-ledger">ratio \u00b7 C:I:O</span></div>')
     for i,(n,m) in enumerate(rows,1):
         y=m["yield"]; you = extra and n==extra[0]
         orders=_math.log10(ymax/y) if y>0 else 99
@@ -151,7 +151,7 @@ def board_html(extra=None, sort_key="yield"):
             f'<span class="mb-num">{_cost_str(m)}</span>'
             f'<span class="mb-y"><span class="mb-bar" style="width:{barpct:.0f}%"></span>'
             f'<span class="mb-yval">{y:,.0f}</span></span>'
-            f'<span class="mb-ledger">R {_fmt_whole(m["raw"]["cache_read"])} \u00b7 C {_fmt_whole(m["raw"]["cache_create"])} \u00b7 I {_fmt_whole(m["raw"]["input"])} \u00b7 O {_fmt_whole(m["raw"]["output"])} \u00b7 \u03a3 {_fmt_whole(m["raw"]["cache_read"]+m["raw"]["cache_create"]+m["raw"]["input"]+m["raw"]["output"])}</span>'
+            f'<span class="mb-ledger">{round((m["raw"]["cache_create"]+m["raw"]["cache_read"])/max(m["raw"]["input"],1))}:1:{round(m["raw"]["output"]/max(m["raw"]["input"],1))}</span>'
             f'</div>')
     out.append('</div>')
     out.append('<div class="mb-foot">\u03a5 bar is log-scaled \u00b7 MO\u00a7ES leads the field by ~4 orders of magnitude \u00b7 $/1M blended cost (~ = list-price estimate) \u00b7 * = structural estimation \u00b7 volume can\'t buy rank</div>')
@@ -772,12 +772,10 @@ def _build_demo():
                 "    <div style='color: #8a7f68; font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 2px;'>Powered by MO\u00a7ES\u2122</div>"
                 "    <h1 style='margin: 0 !important; line-height: 0.9; text-shadow: 0 0 24px rgba(196,146,58,0.25);'>SIGRANK</h1>"
                 "  </div>"
-                "  <div style='flex: none; align-self: flex-end;'><div class='moses-logo'><span class='ml-s'>§</span></div></div>"
-                "  <div style='text-align: right; max-width: 440px; line-height: 1.4;'>"
-                "    <div style='color:#C4923A; font-size: 14px; font-weight: 700;'>Identifying Burners, Builders, and 10\u00d7ers.</div>"
-                "    <div style='color:#E8E0CF; font-size: 13px; font-weight: 600; margin-top: 3px;'>Ranking AI operators on performance, production, architecture &amp; cost efficiency.</div>"
-                "  </div>"
+                "  <div style='text-align: right; max-width: 470px; color:#E8E0CF; font-size: 16px; font-weight: 600; line-height: 1.45;'>Ranking AI operators on performance, production, architecture &amp; cost efficiency.</div>"
                 "</div>"
+                "<div style='display: flex; justify-content: center; margin: 2px 0;'><div class='moses-logo'><span class='ml-s'>§</span></div></div>"
+                "<div style='text-align: center; color:#C4923A; font-size: 14px; font-weight: 700; letter-spacing: 0.02em; margin: 6px 0 10px;'>Identifying Burners, Builders, and 10×ers.</div>"
             )
             # full-width live leaderboard scroller (replaces the old static stat strip)
             gr.HTML(profile_marquee_html())
@@ -840,11 +838,11 @@ npx ccusage@latest codex --json
 
         # ---- TAB: Leaders (the board) ----
         with gr.Tab("Leaders"):
-            gr.Markdown("**The ledger doesn't care what you claim.** Ranked by **\u03a5 = (Cache\u00b7Output)/Input\u00b2** \u2014 raw Read\u00b7Create\u00b7In\u00b7Out stacked under each operator. $/1M is blended cost; efficient architecture is also the cheapest.")
             rank_by = gr.Radio(list(SORT_LABELS.keys()), value="\u03a5 yield",
-                               label="Rank by", elem_id="rank-by")
+                               show_label=False, elem_id="rank-by")
             lb = gr.HTML(board_html())
             rank_by.change(resort_board, rank_by, lb)
+            gr.Markdown("**The ledger doesn't care what you claim.** Ranked by **\u03a5 = (Cache\u00b7Output)/Input\u00b2**. The ratio column is cache:input:output (input = 1). $/1M is blended cost \u2014 efficient architecture is also the cheapest.")
             gr.HTML(metrics_key_html())
             gr.Markdown("*Curated corpus \u00b7 pasting scores you live but isn't persisted unless you sign in \u00b7 $/1M is a list-price recompute (~) \u00b7 \\* = structural estimation.*", elem_id="moses-foot")
 
