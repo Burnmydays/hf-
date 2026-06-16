@@ -19,8 +19,8 @@ CSS = """
 
 #moses-hero {
   border-bottom: 1px solid var(--moses-gold);
-  padding: 16px 0 20px;
-  margin-bottom: 12px;
+  padding: 10px 0 8px;
+  margin-bottom: 6px;
   position: relative;
 }
 #moses-hero h1 {
@@ -44,9 +44,9 @@ CSS = """
 .tabitem {
   background: transparent !important;
   border: none !important;
-  padding: 16px 0px !important;
+  padding: 8px 0px !important;
 }
-.tabitem > div { gap: 20px !important; }
+.tabitem > div { gap: 10px !important; }
 button.selected { color: var(--moses-gold) !important; border-bottom: 2px solid var(--moses-gold) !important; }
 .tab-nav button { color: var(--moses-dim) !important; font-size: 13px !important; letter-spacing: 0.06em; }
 
@@ -137,6 +137,36 @@ button.primary:hover, #compute-btn:hover { background: #d8a449 !important; }
   border: 1px dashed var(--moses-line); border-radius: 6px; background: rgba(196,146,58,0.03); }
 .cmp-note { color: var(--moses-dim); font-size: 10px; margin-top: 8px; }
 @media (max-width: 700px) { .cmp-table th, .cmp-table td { padding: 7px 6px; font-size: 11px; } }
+
+/* ---------- Home / landing ---------- */
+.hm-lead { color: var(--moses-dim); font-size: 11px; letter-spacing: 0.04em;
+  text-transform: uppercase; margin: 2px 2px 6px; }
+.pm-wrap { overflow: hidden; border: 1px solid var(--moses-line); border-radius: 6px;
+  background: var(--moses-card); padding: 8px 0; margin-bottom: 14px; }
+.pm-track { display: flex; gap: 10px; width: max-content; animation: pm-scroll 70s linear infinite; }
+.pm-wrap:hover .pm-track { animation-play-state: paused; }
+@keyframes pm-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.pm-chip { display: flex; align-items: center; gap: 8px; padding: 6px 12px; white-space: nowrap;
+  border-left: 3px solid var(--moses-line); background: rgba(196,146,58,0.04); border-radius: 4px; }
+.pm-chip.species-throughput { border-left-color: var(--species-throughput); }
+.pm-chip.species-converter  { border-left-color: var(--species-converter); }
+.pm-chip.species-architect  { border-left-color: var(--species-architect); }
+.pm-chip.species-cascade    { border-left-color: var(--species-cascade); }
+.pm-rank { color: var(--moses-dim); font-size: 10px; font-weight: 700; }
+.pm-name { color: var(--moses-ink); font-size: 12px; font-weight: 700; }
+.pm-stat { color: var(--moses-gold); font-size: 11px; font-weight: 700; }
+.pm-lev  { color: var(--moses-dim); font-size: 10px; }
+
+.hm-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.hm-box { border: 1px solid var(--moses-line); border-radius: 6px; background: var(--moses-card);
+  padding: 16px 18px; transition: border-color 0.12s ease, background 0.12s ease; }
+.hm-box:hover { border-color: var(--moses-gold); background: rgba(196,146,58,0.06); }
+.hm-title { color: var(--moses-gold); font-size: 15px; font-weight: 800; letter-spacing: 0.04em; }
+.hm-sub { color: var(--moses-ink); font-size: 12px; font-weight: 600; margin-top: 3px; }
+.hm-desc { color: var(--moses-dim); font-size: 11px; margin-top: 6px; line-height: 1.45; }
+.hm-cta { color: var(--moses-gold); font-size: 10px; text-transform: uppercase;
+  letter-spacing: 0.06em; margin-top: 12px; }
+@media (max-width: 700px) { .hm-grid { grid-template-columns: 1fr; } }
 .mb-foot { color: #5f573f; font-size: 10.5px; padding: 10px 8px 0; line-height: 1.6; }
 
 /* composition bar */

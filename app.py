@@ -459,6 +459,39 @@ def compare_html(names):
             '<div class="cmp-note">Gold = leads that metric · $/1M: lower wins · '
             'Υ is the overall rank metric.</div>')
 
+# ---------- Home / landing ----------
+def profile_marquee_html():
+    """Auto-scrolling band of operator chips (rank · name · Υ · leverage). Pure CSS loop."""
+    ops = operators()
+    rows = sorted(((n, compute(*v)) for n, v in ops.items()),
+                  key=lambda r: r[1]["yield"], reverse=True)
+    def chip(rank, n, m):
+        rk = rarity_class(m)[0]
+        return (f'<div class="pm-chip species-{rk}">'
+                f'<span class="pm-rank">#{rank}</span>'
+                f'<span class="pm-name">{_html.escape(n)}</span>'
+                f'<span class="pm-stat">Υ {m["yield"]:,.0f}</span>'
+                f'<span class="pm-lev">{m["leverage"]:,.0f}× lev</span></div>')
+    chips = "".join(chip(i, n, m) for i, (n, m) in enumerate(rows, 1))
+    # chips duplicated so the translateX(-50%) loop is seamless
+    return f'<div class="pm-wrap"><div class="pm-track">{chips}{chips}</div></div>'
+
+_HOME_SECTIONS = [
+    ("Leaders", "The ranked field", "See who wins on architecture, not spend — the whole field, sorted by Υ."),
+    ("Reports", "Full operator read", "Pull any operator's complete profile and a shareable card."),
+    ("VS", "Head-to-head", "Put 2–3 operators side by side. Gold cell takes each metric."),
+    ("Create", "Clock your signal", "Drop your token ledger, get scored, claim your operator card."),
+]
+
+def home_html():
+    boxes = "".join(
+        f'<div class="hm-box"><div class="hm-title">◢ {t}</div>'
+        f'<div class="hm-sub">{s}</div><div class="hm-desc">{d}</div>'
+        f'<div class="hm-cta">open the {t} tab →</div></div>'
+        for t, s, d in _HOME_SECTIONS
+    )
+    return f'<div class="hm-grid">{boxes}</div>'
+
 # ---------- UI ----------
 import os as _os
 _ON_SPACE = bool(_os.environ.get("SPACE_ID"))
@@ -519,6 +552,12 @@ def _build_demo():
                 f'  </div>'
                 f'</div>'
             )
+
+        # ---- TAB: Home (landing — scrolling profiles + section minis) ----
+        with gr.Tab("Home"):
+            gr.HTML('<div class="hm-lead">Live field, scrolling by Υ — hover to pause.</div>')
+            gr.HTML(profile_marquee_html())
+            gr.HTML(home_html())
 
         # ---- TAB: Leaders (the board) ----
         with gr.Tab("Leaders"):
