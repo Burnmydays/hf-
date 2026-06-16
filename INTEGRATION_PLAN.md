@@ -48,61 +48,63 @@ The moses-sigrank and RNS metric systems are **the same signal at the same token
 
 ---
 
-## Things to Flesh Out Before Full Build
+## Decisions Made — Session 2026-06-16
 
-*(These are the honest open questions — don't skip them.)*
+These were open questions. All resolved.
 
-### 1. The Leaderboard Scope Question
-RNS targets Claude + ChatGPT + Gemini + Pi + Multi. moses-sigrank targets Claude + Codex only (because Υ requires `cache_read`/`cache_create` which most platforms don't expose).
+### 1. Multi-platform / cache-less operators
+**Resolved:** The ingest pipeline (`ingest.py`) already handles this. ChatGPT/Gemini operators without cache tokens get Υ = `—` in those cells and still rank by SIGNA RATE from whatever pillars they have. The parser routes by payload shape. No separate leaderboard needed. Already built.
 
-**Question to resolve:** For operators on platforms without cache tokens (ChatGPT, Gemini), what do you show where Υ/leverage/cascade would be? Options:
-- (a) Show `—` for those cells, they still get SIGNA RATE rank
-- (b) Only show Claude/Codex operators on the Υ board, separate leaderboard
-- (c) Drop multi-platform ambition for v1 — focus on Claude operators only
+### 2. Compression Ratio vs SNR naming
+**Resolved:** Keep "Compression Ratio" (M.01) as the canonical RNS name. It aligns with the word-level SigSystem framing (signal_tokens / total_tokens) and the free-tier proxy (`o/(o+i)`) is identical. SNR is the moses-sigrank internal name for the same number. No rename needed — they converge at the formula level.
 
-This affects the data model, the ingest agent adapters, and the leaderboard UI.
+### 3. Species + Class coexisting on profiles
+**Resolved:** Both. Class tier = rank credential (TRANSMITTER etc.). Species = behavioral identity / trading card archetype (Cascade · recursive processing loop). They are orthogonal. Show class in the prestige header; show species as the archetype line on the card and in the operator profile sub-header. A TRANSMITTER Cascade is a different story from a TRANSMITTER Cache Architect. Same rank, different playstyle — that's the BlitzStars equivalent of tank class vs. play style. BlitzStars confirmed: their system gates by tier (experience floors) but doesn't collapse identity into tier. Same pattern here.
 
-### 2. The Compression Ratio Naming Conflict
-moses-sigrank calls `o/(i+o)` "SNR" (signal-to-noise ratio).  
-RNS calls `o/(i+o)` "Compression Ratio" (M.01).
+**BlitzStars experience-floor equivalents already in CANON.md:**
+- Dual-gate (Compression AND SIGNA RATE both required for top 4 classes) — anti-gaming
+- RS.07 promotion stickiness (3 consecutive cycles) — no one-session rank spike
+- B.02 account age + B.03 lifetime messages — the experience floor
 
-They are **literally the same formula**. But the naming matters for user communication and for IP consistency.
+### 4. tokscale.ai and ccusage — outreach decision
+**Resolved:**
+- **tokscale.ai** (@junhoyeo, Seoul, 3.7K stars): Tokscale ranks by volume spent. SigRank ranks by architecture efficiency. Complementary, not competing. Reach out after the leaderboard has real operators. Pitch: "You measure how much. We measure how well." Seed with tokscale users — they're the exact target market.
+- **ccusage** (@ryoppippi, UK, 15.3K stars): This is the data source our ingest pipeline reads. The community around it (CCWarriors, viberank, Straude) is already hungry for leaderboards. Reach out after launch with a "we built the reputation layer for ccusage data" pitch. May link from their README.
+- **Attribution for SEED corpus:** The 10 wild operators came from tokscale.ai's public leaderboard. Credit tokscale.ai as the source in the leaderboard footnote. Their data is publicly published by operators.
+- **Charging yourself:** No. You are the reference operator and proof of concept. MO§ES gets the Founder tier — pre-launch, permanent, zero cost. Your data is what makes the leaderboard real.
 
-**Question:** Does Compression Ratio (RNS naming) fit with your SigSystem/word-level compression framing, or should M.01 be renamed? The free-tier proxy formula is identical regardless.
+### 5. Claim pricing
+**Resolved:**
+- Lifetime claim: **$19 one-time**
+- Launch window (first 100 claimants): **$9** — creates urgency, rewards early movers
+- Anchoring: Pro monthly is $19/mo, so a permanent claim at the same price as one month is a clear deal
+- Pro yearly: **$190/yr** (~17% discount vs monthly)
+- Founder tier: **Yes, at launch** — capped N, permanent, identity badge
 
-### 3. Species vs Class — Two Systems Coexisting
-moses-sigrank: 5 species on a 2×2 quadrant (Scale vs Amplification)  
-RNS: 9 class tiers gating on Compression × SIGNA RATE
+### 6. Trading card format
+**Resolved:** Both faces, triggered by context:
+- **Profile card (stat face):** Codename large, species archetype line, class glyph + tier, SIGNA RATE (128px gold), Υ yield, cascade bars (transmission/commitment/reuse as three horizontal bars — fighter game stats screen style), token composition, badge count
+- **Battle card (identity face):** Narration quote, species quadrant position, strongest/weakest metric, "vs" challenge button
+- Card is a shareable PNG via `/api/og/operators/{codename}` (server-rendered)
+- BlitzStars confirmed: Hall of Fame + replay uploads is the prestige layer. SigRank equivalent = Hall of Signal + snapshot history with verified audit badge
 
-These are **orthogonal** — they describe different things. Class = absolute score tier. Species = behavioral pattern.
+### 7. Product scope — SigRank is BlitzStars for AI operators, not ESPN
+**Resolved:** SigRank v1 = BlitzStars model:
+- Operator stats tracker with deep profiles
+- Circles (clan equivalent)
+- Metrics comparison (tank comparison equivalent)
+- Hall of Signal with seasonal records (Hall of Fame equivalent)
+- Signalgeist Pro (Zeitgeist Pro equivalent — analytics upsell)
+- ~one-person build, Patreon/subscription monetized
 
-**Question:** Do you want both shown on operator profiles? The species label ("Cache Architect · high structural reuse") is the narrative identity of the operator — it's what goes on the trading card. The class tier is the rank credential. They can coexist and are complementary.
+**The ESPN/Twitch/live arena layer is v2+.** Context: there are already 10+ platforms doing live AI agent battles (CodeClash, DeadNet, BattleBench, Clash of Agents, Moltarena, ForgeAI). **The gap none of them fill: they pit AI models against each other. Nobody is ranking human operators.** SigRank's unique position is that the operator is the athlete. The live events layer for SigRank specifically = scheduled submission windows where results drop simultaneously, class promotions visible in real-time. That's a data event, not a streaming infrastructure problem. BlitzStars does this seasonally. We do it weekly. Ship v1 first.
 
-### 4. The SEED Corpus and tokscale.ai Attribution
-The 10 wild operators in the SEED came from tokscale.ai leaderboard. They are public footprints (publicly published by operators).
-
-**Question:** Do you want to attribute them (link to tokscale.ai) or import them as independent verified data? And do you want to reach out to any of them before launch to seed the community?
-
-### 5. The Claim System Pricing
-`STRIPE_PRICE_CLAIM_LIFETIME` is `OPERATOR_OVERRIDE_REQUIRED`. This is the one-time payment to claim a codename.
-
-**Question:** What's the price? Suggested range: $5–$25 one-time. This is also the entry point for the ESPN/battle vision — claiming your codename is the first act of identity.
-
-### 6. Trading Card Format for Battles
-The trading card in moses-sigrank is 380×500px HTML. For the battle/event system you described, cards need to be shareable images (PNG), possibly animated, with stat blocks.
-
-**Question:** Is the card format the trading card game style (stats, passive, effect lines like the species_cards.md describes)? Or more like a stat card (ESPN box score style)? Or both depending on context?
-
-### 7. The "ESPN Network for AI" Scope
-This is the biggest vision question. An ESPN for AI operators implies:
-- Live events / scheduled battles
-- Spectator view (real-time rank changes as new snapshots come in)
-- Commentary / narration layer
-- Tournament brackets
-
-None of this is in the current RNS build. It's additive. But it affects what "v1" is vs what gets phased in.
-
-**Recommendation:** Ship v1 as the leaderboard + profiles + battles (compare page enhanced). The live events layer is v2 after you have operators using it.
+**Live arena competitive landscape (for v2 reference):**
+- CodeClash (codeclash.ai) — split-screen AI coding head-to-head, tournament brackets, "ESPN for AI coding"
+- DeadNet (deadnet.io) — most polished live spectator UX, debate/games/story formats
+- BattleBench (battlebench.ai) — cybersec AI battles, Claude Opus 4.6 is #1 ELO, exact target audience
+- ForgeAI (forgeai.gg) — infrastructure for competitive agent gaming, on-chain payouts
+- Clash of Agents (clashofagents.org) — MMA-style with agent narrative/drama
 
 ---
 
