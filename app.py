@@ -34,11 +34,18 @@ def _fmt_int(n):
         if abs(n)>=d: return f"{n/d:.2f}{u}"
     return str(int(n))
 
+def _fmt_cost(c):
+    """Adaptive $/1M: keep sub-cent values legible instead of rounding to $0.00.
+    e.g. $0.000195 -> $0.0002 (2 sig figs) rather than $0.00."""
+    if c >= 1:    return f"{c:,.2f}"
+    if c >= 0.01: return f"{c:.3f}"
+    return f"{c:.2g}"
+
 def _cost_str(m):
     c = m.get("avg_cost_1m")
     if not c: return "\u2014"
     mark = "~" if m.get("cost_estimated") else ""
-    return f"{mark}${c:.2f}"
+    return f"{mark}${_fmt_cost(c)}"
 
 # ---------- leaderboard (HTML hero, log-scaled Υ, cost column) ----------
 # column label -> metrics key, used by the "Rank by" control on the board
@@ -309,7 +316,7 @@ ranked **#{rank}** of {total_ops} by \u03a5{cav_line}{mode_line}
 | Velocity | {m['velocity']:.3f}\u00d7 | output per input |
 | Leverage | {m['leverage']:,.1f}\u00d7 | reads per human token |
 | Efficiency | {m['efficiency']:,.1f}\u00d7 | vs AA baseline |
-| Avg $/1M | ${m['avg_cost_1m']:.3f} |{cost_note} |
+| Avg $/1M | ${_fmt_cost(m['avg_cost_1m'])} |{cost_note} |
 | **\u03a5 Yield** | **{m['yield']:,.2f}** | un-gameable rank |
 
 **cascade** \u2014 {m['cascade_str']} (transmission \u00d7 commitment \u00d7 reuse)

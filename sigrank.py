@@ -46,6 +46,14 @@ def _fmt_int(n):
     return str(int(n))
 
 
+def _fmt_cost(c):
+    """Adaptive $/1M so sub-cent values stay legible (e.g. $0.0002, not $0.000)."""
+    if not c: return "0.00"
+    if c >= 1:    return f"{c:,.2f}"
+    if c >= 0.01: return f"{c:.3f}"
+    return f"{c:.2g}"
+
+
 def _classify(m):
     if m["non_compounding"]:
         return "Non-Compounding · stateless pipe"
@@ -118,7 +126,7 @@ def render(name, m, how, color=True):
         ("10x DEV", dev),
         ("velocity", f"{m['velocity']:.2f}×"),
         ("leverage", f"{m['leverage']:,.0f}×"),
-        ("$/1M", f"{'~' if m['cost_estimated'] else ''}${m['avg_cost_1m']:.3f}"),
+        ("$/1M", f"{'~' if m['cost_estimated'] else ''}${_fmt_cost(m['avg_cost_1m'])}"),
     ]
     for k, v in metrics:
         out.append("  " + _c(f"{k:<10}", DIM, color) + v)
@@ -133,6 +141,18 @@ def render(name, m, how, color=True):
     return "\n".join(out)
 
 
+def _submit_row(name, i, o, cw, cr, meta, source):
+    """Direct-submit a row to the board. Returns a status line to print."""
+    if not db.writes_enabled():
+        return ("  submit: skipped — set SUPABASE_URL + SUPABASE_SERVICE_KEY in your "
+                "env to write directly, or paste the row above on the Space.")
+    ok = db.save_operator(name, i, o, cw, cr, cost=meta.get("cost"), source=source,
+                          estimated=bool(meta.get("estimated")),
+                          caveat=meta.get("caveat"), hf_user=name)
+    return (f"  submit: ✓ '{name}' written to the board"
+            if ok else "  submit: ✗ write failed (see [db] note above)")
+
+
 def main(argv=None):
     p = argparse.ArgumentParser(prog="sigrank", description="Local-first SigRank importer.")
     p.add_argument("stdin_dash", nargs="?", default=None, help="pass '-' to read JSON from stdin")
@@ -141,6 +161,9 @@ def main(argv=None):
     p.add_argument("--all", action="store_true",
                    help="run every provider in turn (claude, then codex)")
     p.add_argument("--name", default="you", help="label for your row")
+    p.add_argument("--submit", action="store_true",
+                   help="write your row straight to the board (needs SUPABASE_URL + "
+                        "SUPABASE_SERVICE_KEY in env); otherwise just prints the paste row")
     p.add_argument("--no-color", action="store_true", help="plain output")
     args = p.parse_args(argv)
     args.stdin = args.stdin_dash == "-"
@@ -167,6 +190,8 @@ def main(argv=None):
                 if meta.get("estimated"):
                     m["_caveat"] = meta.get("caveat")
                 print(render(name, m, how, color))
+                if args.submit:
+                    print(_submit_row(name, i, o, cw, cr, meta, source=f"cli:{provider}"))
                 if not is_codex and o > 0:        # capture Claude ratio for the Codex pass
                     claude_profile = {"model_type": "claude", "io_ratio": i / o}
             except Exception as e:
@@ -199,7 +224,11 @@ def main(argv=None):
     m = compute(i, o, cw, cr, cost_usd=meta.get("cost"))
     if meta.get("estimated"):
         m["_caveat"] = meta.get("caveat")
-    print(render((args.name or "you").strip()[:24] or "you", m, how, color))
+    sub_name = (args.name or "you").strip()[:24] or "you"
+    print(render(sub_name, m, how, color))
+    if args.submit:
+        src = "cli:codex" if args.codex else "cli:claude"
+        print(_submit_row(sub_name, i, o, cw, cr, meta, source=src))
     return 0
 
 
