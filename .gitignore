@@ -25,3 +25,7 @@ SUPABASE_MIGRATION.md
 builddemo.md
 bdemo2.md
 notes:.md.md
+
+# playwright MCP screenshot artifacts
+.playwright-mcp/
+_*.png
