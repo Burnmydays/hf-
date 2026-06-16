@@ -721,7 +721,21 @@ def home_footer_html():
 
 # ---------- UI ----------
 import os as _os
+import base64 as _base64
 _ON_SPACE = bool(_os.environ.get("SPACE_ID"))
+
+# MO§ES logo (gold § in concentric rings on a dark disc), as a base64 data-URI <img>
+# so it survives Gradio's HTML sanitizer (which strips inline <svg>).
+_LOGO_SVG = (
+    "<svg xmlns='http://www.w3.org/2000/svg' width='66' height='66' viewBox='0 0 100 100'>"
+    "<circle cx='50' cy='50' r='48' fill='#0F0D0A'/>"
+    "<circle cx='50' cy='50' r='44' fill='none' stroke='#C4923A' stroke-width='2'/>"
+    "<circle cx='50' cy='50' r='36' fill='none' stroke='#C4923A' stroke-width='1' opacity='0.4'/>"
+    "<text x='50' y='54' text-anchor='middle' dominant-baseline='central' "
+    "font-family='Georgia, serif' font-size='56' font-weight='700' fill='#C4923A'>§</text>"
+    "</svg>"
+)
+_LOGO_DATA_URI = "data:image/svg+xml;base64," + _base64.b64encode(_LOGO_SVG.encode("utf-8")).decode("ascii")
 
 # Ghost/"unminted" card so the right column is never an empty void on first load.
 CARD_PLACEHOLDER = (
@@ -752,14 +766,7 @@ def _build_demo():
                 "    <div style='color: #8a7f68; font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 2px;'>Powered by MO\u00a7ES\u2122</div>"
                 "    <h1 style='margin: 0 !important; line-height: 0.9; text-shadow: 0 0 24px rgba(196,146,58,0.25);'>SIGRANK</h1>"
                 "  </div>"
-                "  <div style='flex: none; align-self: center;'>"
-                "    <svg width='64' height='64' viewBox='0 0 100 100' style='filter: drop-shadow(0 0 14px rgba(196,146,58,0.40));'>"
-                "      <circle cx='50' cy='50' r='48' fill='#0F0D0A'/>"
-                "      <circle cx='50' cy='50' r='44' fill='none' stroke='#C4923A' stroke-width='2'/>"
-                "      <circle cx='50' cy='50' r='36' fill='none' stroke='#C4923A' stroke-width='1' opacity='0.4'/>"
-                "      <text x='50' y='53' text-anchor='middle' dominant-baseline='central' font-family='Georgia, \"Times New Roman\", serif' font-size='54' font-weight='700' fill='#C4923A'>§</text>"
-                "    </svg>"
-                "  </div>"
+                f"  <div style='flex: none; align-self: center;'><img src='{_LOGO_DATA_URI}' width='66' height='66' alt='MO§ES' style='filter: drop-shadow(0 0 14px rgba(196,146,58,0.40));'></div>"
                 "  <div style='text-align: right; color: #E8E0CF; font-size: 14px; font-weight: 600; line-height: 1.5; max-width: 420px; padding-top: 34px;'>"
                 "    Ranking AI operators on performance, production, architecture &amp; cost efficiency. "
                 "    <span style='color:#C4923A;'>Identifying Burners, Builders, and 10\u00d7ers.</span>"
