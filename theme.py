@@ -235,6 +235,32 @@ button.primary:hover, #compute-btn:hover { background: #d8a449 !important; }
 
 footer { display: none !important; }
 
+/* ---------- metrics key (collapsible legend under the board) ---------- */
+.metric-key { margin: 10px 2px 0; border: 1px solid #3A3324; border-radius: 6px;
+  background: rgba(196,146,58,0.04); }
+.metric-key summary { cursor: pointer; padding: 9px 12px; color: #C4923A;
+  font-size: 12px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+  list-style: none; }
+.metric-key summary::-webkit-details-marker { display: none; }
+.metric-key summary::before { content: "▸ "; color: #8a7f68; }
+.metric-key[open] summary::before { content: "▾ "; }
+.metric-key .mk-hint { color: #8a7f68; font-weight: 400; text-transform: none;
+  letter-spacing: 0; font-size: 11px; }
+.mk-legend { padding: 4px 12px 12px; }
+.mk-note { color: #8a7f68; font-size: 11px; margin: 2px 0 10px; }
+.mk-note b { color: #C4923A; }
+.mk-row { display: grid; grid-template-columns: 96px 150px 130px 1fr; gap: 8px;
+  align-items: baseline; padding: 6px 0; border-top: 1px solid #2c2718; }
+.mk-name { color: #E8E0CF; font-weight: 700; font-size: 12px; }
+.mk-form { color: #C4923A; font-family: ui-monospace, monospace; font-size: 11px; }
+.mk-alias { color: #8a7f68; font-size: 11px; font-style: italic; }
+.mk-desc { color: #a89e85; font-size: 11px; line-height: 1.45; }
+@media (max-width: 700px) {
+  /* stack each metric into a card on phones */
+  .mk-row { grid-template-columns: 1fr; gap: 2px; }
+  .mk-form { font-size: 10px; }
+}
+
 @media (max-width: 700px) {
   /* mobile: collapse both boards to rank · operator · Υ. The numeric middle
      columns drop out entirely instead of being crushed into too-few tracks.

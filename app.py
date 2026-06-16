@@ -142,6 +142,45 @@ def board_html(extra=None, sort_key="yield"):
     out.append('<div class="mb-foot">\u03a5 bar is log-scaled \u00b7 MO\u00a7ES leads the field by ~4 orders of magnitude \u00b7 $/1M blended cost (~ = list-price estimate) \u00b7 * = structural estimation \u00b7 volume can\'t buy rank</div>')
     return "".join(out)
 
+# raw token pillars: I=input  O=output  Cw=cache-create  Cr=cache-read
+_METRIC_KEY = [
+    ("\u03a5 yield", "(Cr\u00b7O) / I\u00b2", "leverage \u00d7 velocity",
+     "The rank metric. Rewards architecture \u2014 reused context (Cr) and produced signal (O) "
+     "measured against fresh input (I). Squaring I is why raw volume can't buy rank."),
+    ("SNR", "O / (I+O)", "signal-to-noise",
+     "Share of the exchange that is model-generated signal vs. human/system input. "
+     "\u22650.84 = TRANSMITTER class."),
+    ("10x DEV", "log\u2081\u2080(transmission \u00d7 commitment \u00d7 reuse)", "= log\u2081\u2080(leverage)",
+     "The cascade in orders of magnitude \u2014 the \u201810^x\u2019 developer multiplier. "
+     "(O/I)\u00b7(Cw/O)\u00b7(Cr/Cw) telescopes to Cr/I, so this is literally log\u2081\u2080 of leverage."),
+    ("velocity", "O / I", "throughput",
+     "Output produced per input token spent. Single-pass processing speed."),
+    ("leverage", "Cr / I", "reuse amplification",
+     "How many times context is re-read (cache-read) per fresh input token. "
+     "The core architectural signal \u2014 high leverage = a compounding cache, not a stateless pipe."),
+    ("$/1M", "blended cost / 1M tokens", "across all states",
+     "Average cost per million tokens across input, output, and cache. "
+     "Efficient architecture is also the cheapest. ~ = recomputed at list price."),
+]
+
+def metrics_key_html():
+    """Collapsible legend for the board columns. Definitions match metrics.compute exactly."""
+    rows = "".join(
+        f'<div class="mk-row"><span class="mk-name">{n}</span>'
+        f'<span class="mk-form">{f}</span>'
+        f'<span class="mk-alias">{a}</span>'
+        f'<span class="mk-desc">{d}</span></div>'
+        for n, f, a, d in _METRIC_KEY
+    )
+    return (
+        '<details class="metric-key"><summary>What do these metrics mean? '
+        '<span class="mk-hint">(tap to expand)</span></summary>'
+        '<div class="mk-legend">'
+        '<div class="mk-note">Raw pillars: <b>I</b> input \u00b7 <b>O</b> output \u00b7 '
+        '<b>Cw</b> cache-create \u00b7 <b>Cr</b> cache-read</div>'
+        f'{rows}</div></details>'
+    )
+
 # ---------- profile ----------
 def classify(m):
     if m["non_compounding"]: return "Non-Compounding \u00b7 stateless pipe"
@@ -442,6 +481,7 @@ def _build_demo():
                                        label="Rank by", elem_id="rank-by")
                     lb = gr.HTML(board_html())
                     rank_by.change(resort_board, rank_by, lb)
+                    gr.HTML(metrics_key_html())
                     gr.Markdown("*Curated corpus \u00b7 pasting scores you live but isn't persisted unless you sign in \u00b7 $/1M is a list-price recompute (~) \u00b7 \\* = structural estimation.*", elem_id="moses-foot")
                 with gr.Column(scale=5):
                     gr.Markdown("### Operator profile inspector")
