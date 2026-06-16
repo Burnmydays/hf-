@@ -29,21 +29,29 @@ tags:
 
 # MO§ES™ SigRank — the diagnostic x-ray of the token economy
 
+[![HF Space](https://img.shields.io/badge/🤗%20Space-build--small--hackathon%2Fsigrank-yellow)](https://huggingface.co/spaces/build-small-hackathon/sigrank)
+[![Model](https://img.shields.io/badge/model-MiniCPM4--0.5B-orange)](https://huggingface.co/openbmb/MiniCPM4-0.5B)
+[![License](https://img.shields.io/badge/license-MIT-blue)](https://github.com/SunrisesIllNeverSee/moses-sigrank/blob/main/LICENSE)
+[![Zenodo](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.18792459-blue)](https://zenodo.org/records/20029607)
+[![Patent Pending](https://img.shields.io/badge/patent-pending%2019%2F426%2C028-lightgrey)](https://mos2es.com/legal)
+[![Benchmarks](https://img.shields.io/badge/benchmarks-%231%20in%205%20kernels-brightgreen)](https://mos2es.com/benchmarks)
+[![Track](https://img.shields.io/badge/track-Thousand%20Token%20Wood%20🍄-brown)](https://huggingface.co/spaces/build-small-hackathon/sigrank)
+
 A leaderboard that judges AI coding operators by **architecture, not budget**.
 Paste your token usage; get an operator profile with a tiny-model narration and
 your rank. The ranking metric **Υ = (Cache·Output)/Input²** penalizes raw-input
 padding quadratically — volume can't buy rank — but Υ is only the headline of a
 larger metric system whose mathematical thesis is the **cascade decomposition**.
 
-**GitHub:** [github.com/SunrisesIllNeverSee](https://github.com/SunrisesIllNeverSee) · **Repo:** [SunrisesIllNeverSee/moses-sigrank](https://github.com/SunrisesIllNeverSee/moses-sigrank) · **Deck:** [mos2es.com/deck](https://mos2es.com/deck) · **Benchmarks:** [mos2es.com/benchmarks](https://mos2es.com/benchmarks)
+**GitHub:** [github.com/SunrisesIllNeverSee](https://github.com/SunrisesIllNeverSee) · **Repo:** [moses-sigrank](https://github.com/SunrisesIllNeverSee/moses-sigrank) · **Deck:** [mos2es.com/deck](https://mos2es.com/deck) · **Benchmarks:** [mos2es.com/benchmarks](https://mos2es.com/benchmarks) · **Law:** [mos2es.com](https://mos2es.com)
 
 ---
 
-> **SigRank is Layer 2 of the MO§ES™ stack** (SIGRANK: human–AI operator intelligence).
-> MO§ES™ is the substrate — compression, recursive execution, drift control, governed meaning at source.
+> **SigRank is Layer 2 of the MO§ES™ stack** — the human–AI operator intelligence layer.
+> MO§ES™ is the substrate: compression, recursive execution, drift control, governed meaning at source.
 > Built by [Deric J. McHenry](https://github.com/SunrisesIllNeverSee) · Ello Cello LLC.
 >
-> **IP:** 4 patent filings · IC 042 trademark · [Conservation Law of Commitment — Zenodo DOI 10.5281/zenodo.18792459](https://zenodo.org/records/20029607)
+> **IP:** 4 patent filings · IC 042 TM 99408355 · [Conservation Law of Commitment — Zenodo DOI 10.5281/zenodo.18792459](https://zenodo.org/records/20029607)
 
 ---
 
