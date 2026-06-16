@@ -114,6 +114,29 @@ button.primary:hover, #compute-btn:hover { background: #d8a449 !important; }
   background: linear-gradient(90deg, rgba(196,146,58,0.28), rgba(196,146,58,0.72)); border-radius: 2px; }
 .mb-row.you .mb-bar { background: linear-gradient(90deg, rgba(196,146,58,0.4), #C4923A); }
 .mb-yval { position: relative; z-index: 2; color: #E8E0CF; font-weight: 700; font-size: 12px; padding-right: 4px; }
+/* warmer, more inviting rows: subtle gold wash on hover, breathing room for the ledger line */
+.mb-row { transition: background 0.12s ease; }
+.mb-row:hover { background: rgba(196,146,58,0.07); }
+.mb-raw { display: inline-block; margin-top: 3px; letter-spacing: 0.02em; opacity: 0.82; }
+/* warm focus ring on the operator pickers */
+#op-pick input:focus, #cmp-pick input:focus { box-shadow: 0 0 0 1px var(--moses-gold) !important; }
+
+/* ---------- VS / compare table ---------- */
+.cmp-table { width: 100%; border-collapse: collapse; background: var(--moses-card);
+  border: 1px solid var(--moses-line); border-radius: 6px; overflow: hidden; margin-top: 6px; }
+.cmp-table th, .cmp-table td { padding: 10px 12px; text-align: right; font-size: 13px;
+  border-bottom: 1px solid var(--moses-line); }
+.cmp-table thead th { color: var(--moses-gold); text-transform: uppercase; font-size: 11px;
+  letter-spacing: 0.05em; border-bottom: 1px solid var(--moses-gold); }
+.cmp-table th.cmp-op { color: var(--moses-ink); font-weight: 700; }
+.cmp-rowlabel { text-align: left !important; color: var(--moses-dim); text-transform: uppercase;
+  font-size: 10px; letter-spacing: 0.05em; }
+.cmp-win { color: var(--moses-bg) !important; background: var(--moses-gold) !important;
+  font-weight: 700; }
+.cmp-empty { padding: 26px; text-align: center; color: var(--moses-dim);
+  border: 1px dashed var(--moses-line); border-radius: 6px; background: rgba(196,146,58,0.03); }
+.cmp-note { color: var(--moses-dim); font-size: 10px; margin-top: 8px; }
+@media (max-width: 700px) { .cmp-table th, .cmp-table td { padding: 7px 6px; font-size: 11px; } }
 .mb-foot { color: #5f573f; font-size: 10.5px; padding: 10px 8px 0; line-height: 1.6; }
 
 /* composition bar */

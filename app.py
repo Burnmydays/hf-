@@ -423,6 +423,42 @@ def view_operator(name):
     read = narrate(name, m, classify(m))
     return profile_md(name, m, rank, len(rows), read), card_html(name, m, rank, len(rows), read)
 
+# ---------- VS / compare ----------
+# (label, metrics key, winner = max|min, value formatter)
+_CMP_ROWS = [
+    ("Υ yield",  "yield",       "max", lambda v: f"{v:,.0f}"),
+    ("SNR",      "snr",         "max", lambda v: f"{v:.3f}"),
+    ("leverage", "leverage",    "max", lambda v: f"{v:,.0f}×"),
+    ("velocity", "velocity",    "max", lambda v: f"{v:.2f}×"),
+    ("10x DEV",  "dev10x",      "max", lambda v: f"{v:.2f}"),
+    ("$/1M",     "avg_cost_1m", "min", lambda v: f"${_fmt_cost(v)}"),
+]
+
+def compare_html(names):
+    """Head-to-head table for 2–3 operators; best value per row gets the gold cell."""
+    ops = operators()
+    names = [n for n in (names or []) if n in ops][:3]
+    if len(names) < 2:
+        return ('<div class="cmp-empty">Pick <b>2–3 operators</b> above to put them '
+                'head-to-head. Winner takes each row.</div>')
+    ms = [(n, compute(*ops[n])) for n in names]
+    head = "".join(f'<th class="cmp-op">{_html.escape(n)}</th>' for n, _ in ms)
+    body = []
+    for label, key, mode, fmt in _CMP_ROWS:
+        vals = [m.get(key) for _, m in ms]
+        nums = [v for v in vals if v is not None]
+        best = (max if mode == "max" else min)(nums) if nums else None
+        cells = []
+        for v in vals:
+            win = v is not None and best is not None and v == best and len(nums) > 1
+            cells.append(f'<td class="{"cmp-win" if win else ""}">'
+                         f'{fmt(v) if v is not None else "—"}</td>')
+        body.append(f'<tr><th class="cmp-rowlabel">{label}</th>{"".join(cells)}</tr>')
+    return (f'<table class="cmp-table"><thead><tr><th></th>{head}</tr></thead>'
+            f'<tbody>{"".join(body)}</tbody></table>'
+            '<div class="cmp-note">Gold = leads that metric · $/1M: lower wins · '
+            'Υ is the overall rank metric.</div>')
+
 # ---------- UI ----------
 import os as _os
 _ON_SPACE = bool(_os.environ.get("SPACE_ID"))
@@ -450,19 +486,21 @@ def _build_demo():
     with _b:
         with gr.Column(elem_id="moses-hero"):
             gr.HTML(
-                "<div style='display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #C4923A; padding-bottom: 12px; margin-bottom: 16px;'>"
+                "<div style='display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #C4923A; padding-bottom: 10px; margin-bottom: 12px;'>"
                 "  <div>"
-                "    <h1 style='color: #C4923A !important; font-size: 36px !important; font-weight: 800 !important; letter-spacing: 0.2em !important; margin: 0 !important; line-height: 1.1;'>MO\u00a7ES<span style='font-size: 16px; vertical-align: super; font-weight: 400; letter-spacing: normal;'>\u2122</span> <span style='color: #E8E0CF; font-weight: 300;'>SIGRANK</span></h1>"
-                "    <p style='color: #8a7f68 !important; font-size: 11px !important; letter-spacing: 0.05em !important; margin: 6px 0 0 0 !important; text-transform: uppercase;'>Diagnostic X-Ray of the Token Economy // Continuous Architectural Profiling</p>"
+                "    <div style='color: #8a7f68; font-size: 10px; letter-spacing: 0.28em; text-transform: uppercase; margin-bottom: 2px;'>Powered by MO\u00a7ES\u2122</div>"
+                "    <h1 style='color: #C4923A !important; font-size: 44px !important; font-weight: 800 !important; letter-spacing: 0.18em !important; margin: 0 !important; line-height: 1.0;'>SIGRANK</h1>"
+                "    <p style='color: #E8E0CF !important; font-size: 14px !important; letter-spacing: 0.02em !important; margin: 8px 0 0 0 !important; font-weight: 600;'>The performance ranking for AI operators. <span style='color:#C4923A;'>Volume is loud \u2014 architecture wins.</span></p>"
+                "    <p style='color: #8a7f68 !important; font-size: 12px !important; margin: 4px 0 0 0 !important;'>Rank it. Compare it. Prove your loop \u2014 scored on how you build, not how much you burn.</p>"
                 "  </div>"
-                "  <div style='text-align: right; font-size: 10px; color: #8a7f68; letter-spacing: 0.1em; line-height: 1.4; font-weight: bold;'>"
+                "  <div style='text-align: right; font-size: 10px; color: #8a7f68; letter-spacing: 0.1em; line-height: 1.4; font-weight: bold; white-space: nowrap;'>"
                 "    SYSTEM STATUS: <span style='color: #22c55e;'>ONLINE</span><br>"
                 "    METRIC VECTOR: <span style='color: #C4923A;'>\u03a5 = (C\u00b7O)/I\u00b2</span>"
                 "  </div>"
                 "</div>"
             )
             gr.HTML(
-                f'<div id="moses-stat-strip" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; background: #1E1B15; border: 1px solid #3A3324; padding: 12px 18px; border-radius: 6px; margin-bottom: 24px;">'
+                f'<div id="moses-stat-strip" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; background: #1E1B15; border: 1px solid #3A3324; padding: 10px 18px; border-radius: 6px; margin-bottom: 10px;">'
                 f'  <div style="border-right: 1px solid #3A3324; padding-right: 10px;">'
                 f'    <div style="font-size: 9px; color: #8a7f68; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 2px;">Operators Profiled</div>'
                 f'    <div style="font-size: 20px; color: #E8E0CF; font-weight: 700;">{len(_ops_now)} <span style="font-size: 11px; color: #8a7f68; font-weight: normal;">nodes</span></div>'
@@ -482,27 +520,37 @@ def _build_demo():
                 f'</div>'
             )
 
-        # ---- TAB 1: Leaderboard (board + sticky profile inspector) ----
-        with gr.Tab("Leaderboard"):
-            gr.Markdown("Ranked by **\u03a5 = (Cache\u00b7Output)/Input\u00b2**. Raw Read\u00b7Create\u00b7In\u00b7Out stacked under each operator. $/1M is blended cost \u2014 efficient architecture is also the cheapest.")
-            with gr.Row():
-                with gr.Column(scale=7):
-                    rank_by = gr.Radio(list(SORT_LABELS.keys()), value="\u03a5 yield",
-                                       label="Rank by", elem_id="rank-by")
-                    lb = gr.HTML(board_html())
-                    rank_by.change(resort_board, rank_by, lb)
-                    gr.HTML(metrics_key_html())
-                    gr.Markdown("*Curated corpus \u00b7 pasting scores you live but isn't persisted unless you sign in \u00b7 $/1M is a list-price recompute (~) \u00b7 \\* = structural estimation.*", elem_id="moses-foot")
-                with gr.Column(scale=5):
-                    gr.Markdown("### Operator profile inspector")
-                    op_pick = gr.Dropdown(_names, label="Select an operator to pull their card",
-                                          value=None, elem_id="op-pick")
-                    op_card = gr.HTML(CARD_PLACEHOLDER)
-                    op_prof = gr.Markdown(elem_id="moses-profile")
-                    op_pick.change(view_operator, op_pick, [op_prof, op_card])
+        # ---- TAB: Leaders (the board) ----
+        with gr.Tab("Leaders"):
+            gr.Markdown("**The ledger doesn't care what you claim.** Ranked by **\u03a5 = (Cache\u00b7Output)/Input\u00b2** \u2014 raw Read\u00b7Create\u00b7In\u00b7Out stacked under each operator. $/1M is blended cost; efficient architecture is also the cheapest.")
+            rank_by = gr.Radio(list(SORT_LABELS.keys()), value="\u03a5 yield",
+                               label="Rank by", elem_id="rank-by")
+            lb = gr.HTML(board_html())
+            rank_by.change(resort_board, rank_by, lb)
+            gr.HTML(metrics_key_html())
+            gr.Markdown("*Curated corpus \u00b7 pasting scores you live but isn't persisted unless you sign in \u00b7 $/1M is a list-price recompute (~) \u00b7 \\* = structural estimation.*", elem_id="moses-foot")
 
-        # ---- TAB 2: Clock Your Signal (primary importer up top, then ingest + card) ----
-        with gr.Tab("Clock Your Signal"):
+        # ---- TAB: Reports (operator profile inspector) ----
+        with gr.Tab("Reports"):
+            gr.Markdown("### Full architectural read on any operator\nPick a name to pull their complete profile and a shareable operator card.")
+            with gr.Row():
+                with gr.Column(scale=5):
+                    op_pick = gr.Dropdown(_names, label="Operator", value=None, elem_id="op-pick")
+                    op_card = gr.HTML(CARD_PLACEHOLDER)
+                with gr.Column(scale=6):
+                    op_prof = gr.Markdown(elem_id="moses-profile")
+            op_pick.change(view_operator, op_pick, [op_prof, op_card])
+
+        # ---- TAB: VS (head-to-head compare) ----
+        with gr.Tab("VS"):
+            gr.Markdown("### Put operators head-to-head\nSelect 2\u20133 operators. Gold cell wins each metric. **This is where architecture beats budget in plain sight.**")
+            cmp_pick = gr.Dropdown(_names, label="Operators (pick 2\u20133)", value=None,
+                                   multiselect=True, max_choices=3, elem_id="cmp-pick")
+            cmp_out = gr.HTML(compare_html(None))
+            cmp_pick.change(compare_html, cmp_pick, cmp_out)
+
+        # ---- TAB: Create (clock your signal \u2014 the importer) ----
+        with gr.Tab("Create"):
             gr.Markdown("### Primary path \u2014 run the local importer")
             gr.Markdown("Reads your usage on your own machine. **Nothing leaves your computer.** Clone it once, then run:")
             gr.Code(value="git clone https://github.com/Burnmydays/hf-\ncd hf-\n./sigrank",
