@@ -191,6 +191,77 @@ def metrics_key_html():
         f'{rows}</div></details>'
     )
 
+_STANDARD_METRICS = [
+    ("Total Tokens", "Input + Output", "Raw count of everything processed. Higher = more usage."),
+    ("Input Tokens", "prompt / context", "How much you feed in \u2014 often the biggest cost driver."),
+    ("Output Tokens", "model generation", "How much the model writes. Longer answers cost more."),
+    ("Tokens/sec \u00b7 Latency", "speed", "How fast it runs \u2014 nothing about how well."),
+    ("Cost ($)", "$ per 1M tokens", "Dollars from token pricing. Counts spend, not skill."),
+]
+_SIGRANK_METRICS = [
+    ("\u03a5 \u2014 Upsilon", "(Cache \u00d7 Output) / Input\u00b2",
+     "Standard just adds Input + Output. \u03a5 squares input to punish waste while rewarding reuse (cache) and real output.",
+     "Encourages tight, smart prompts instead of long ones."),
+    ("Signal-to-Noise (SNR)", "Out / (In + Out)",
+     "Standard counts every output token equally. SNR separates useful signal from repetitive fluff.",
+     "Rewards quality, not length."),
+    ("Cache Leverage", "Cache-read / Input",
+     "Standard ignores reuse \u2014 every call is fresh. This measures the \u2018free\u2019 work you get from remembering prior results.",
+     "Big win for systems that avoid repeating work."),
+    ("Cascade Velocity", "10 \u00d7 10 \u00d7 20",
+     "Standard might just time the whole run. This tracks smooth chaining of steps (10 focused ops \u2192 10 more \u2192 20\u00d7 leverage).",
+     "Rewards well-designed pipelines over messy long chains."),
+]
+_COMPARE_ROWS = [
+    ("Focus", "How much you use", "How well you use it"),
+    ("Penalizes", "Nothing \u2014 bigger is often \u2018better\u2019", "Wasteful inputs, fluff, poor reuse"),
+    ("Rewards", "Volume &amp; speed", "Efficiency, quality, smart architecture"),
+    ("Easy to game?", "Very \u2014 just inflate prompts", "Hard \u2014 square penalty + quality checks"),
+    ("Best for", "Billing &amp; raw scale", "Hackathons, governance, Build Small"),
+]
+
+def metrics_explainer_html():
+    """The full 'what the metrics mean' education: SigRank vs standard token metrics,
+    the thermodynamic grounding, and a side-by-side comparison."""
+    std = "".join(
+        f'<div class="mx-item"><div class="mx-item-head"><span class="mx-name">{n}</span>'
+        f'<span class="mx-form">{f}</span></div><div class="mx-desc">{d}</div></div>'
+        for n, f, d in _STANDARD_METRICS)
+    sig = "".join(
+        f'<div class="mx-item"><div class="mx-item-head"><span class="mx-name">{n}</span>'
+        f'<span class="mx-form">{f}</span></div>'
+        f'<div class="mx-vs"><b>vs standard:</b> {v}</div>'
+        f'<div class="mx-result">\u2192 {r}</div></div>'
+        for n, f, v, r in _SIGRANK_METRICS)
+    comp = "".join(
+        f'<tr><th class="mx-aspect">{a}</th><td>{s}</td><td class="mx-win">{g}</td></tr>'
+        for a, s, g in _COMPARE_ROWS)
+    return (
+        '<div class="mx-wrap">'
+        '<div class="mx-analogy">Standard token metrics are an <b>odometer</b> \u2014 they count '
+        'distance (tokens used). <span class="mx-gold">SigRank is a fuel-efficiency + '
+        'smart-driving score</span> \u2014 it judges how intelligently you drive.</div>'
+        '<div class="mx-cols">'
+        '<div class="mx-col mx-col-std"><div class="mx-col-head">Standard Token Metrics</div>'
+        f'{std}<div class="mx-foot">Rewards <b>volume &amp; scale</b> \u2014 easy to track, easy to game '
+        '(this is \u201ctokenmaxxing\u201d).</div></div>'
+        '<div class="mx-col mx-col-sig"><div class="mx-col-head">SigRank Metrics</div>'
+        f'{sig}<div class="mx-foot">Rewards <b>efficiency, quality &amp; architecture</b> \u2014 the same '
+        'numbers, turned into judgment.</div></div>'
+        '</div>'
+        '<table class="mx-table"><thead><tr><th>Aspect</th><th>Standard</th>'
+        '<th class="mx-win">SigRank</th></tr></thead><tbody>' + comp + '</tbody></table>'
+        '<div class="mx-thermo"><div class="mx-thermo-h">\u25c6 Why square the input? \u2014 the thermodynamic floor</div>'
+        'The metrics are grounded in <b>Landauer\u2019s principle</b>: processing or erasing information '
+        'carries a real, physical energy cost (on the order of kT\u00b7ln2 per bit). Tokens aren\u2019t free \u2014 '
+        'every input bit you push through has a price. SigRank takes that seriously: it rewards '
+        '<b>reusing</b> what you already computed (cache) and <b>minimizing fresh input</b>, the way an '
+        'efficient engine minimizes wasted heat. Squaring input in \u03a5 is that penalty made concrete.</div>'
+        '<div class="mx-bottom">Bottom line: standard metrics are great for paying the bill. '
+        'SigRank adds judgment \u2014 it ranks by <span class="mx-gold">cleverness, not consumption.</span> '
+        'That\u2019s \u201cown your loop.\u201d</div>'
+        '</div>')
+
 # ---------- profile ----------
 def classify(m):
     if m["non_compounding"]: return "Non-Compounding \u00b7 stateless pipe"
@@ -705,8 +776,6 @@ npx ccusage@latest codex --json
                     blob = gr.Textbox(label="ccusage JSON \u2014or\u2014 four numbers (I O C R)", lines=5,
                                       placeholder='Paste ccusage JSON here\n\nor four numbers: input output cache_create cache_read\n\nExample: 1251211 11296121 128196310 2555179769')
                     go = gr.Button("Clock My Signal", variant="primary", elem_id="compute-btn")
-                    gr.Markdown("### What the metrics mean")
-                    gr.HTML(metrics_key_html())
                     gr.Markdown("### Greatest hits")
                     hits = gr.HTML()
                 with gr.Column(scale=6):
@@ -723,6 +792,8 @@ npx ccusage@latest codex --json
                     ['1251211 11296121 128196310 2555179769', 'manual-paste'],
                 ],
                 inputs=[blob, nm])
+            gr.Markdown("### What the metrics mean")
+            gr.HTML(metrics_explainer_html())
 
         # ---- TAB: Leaders (the board) ----
         with gr.Tab("Leaders"):

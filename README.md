@@ -39,7 +39,7 @@ tags:
 
 A leaderboard that judges AI coding operators by **architecture, not budget**.
 Paste your token usage; get an operator profile with a tiny-model narration and
-your rank. The ranking metric **Υ = (Cache·Output)/Input²** penalizes raw-input
+your rank. The ranking metric **Υ = (cache_read · output) / input²** (here "Cache" = `cache_read`) penalizes raw-input
 padding quadratically — volume can't buy rank — but Υ is only the headline of a
 larger metric system whose mathematical thesis is the **cascade decomposition**.
 
@@ -174,7 +174,7 @@ MO§ES occupies the **empty quadrant** — low scale, high amplification. The cl
 | Leverage | C/I | cache reads per human token |
 | Efficiency | (C+O)/I ÷ 4.0 | vs AA baseline |
 | Avg $/1M | blended cost ÷ total | efficient architecture is also cheapest |
-| **Υ (Yield)** | (C·O)/I² | **un-gameable ranking metric** |
+| **Υ (Yield)** | (Cr·O)/I² | **un-gameable ranking metric** (Cr = cache_read) |
 
 ## Benchmark convergence — two independent instruments
 
