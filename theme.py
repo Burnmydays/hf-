@@ -182,8 +182,10 @@ button.primary:hover, #compute-btn:hover { background: #d8a449 !important; }
 .mf-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
 .mf-box { border: 1px solid var(--moses-gold); border-radius: 6px; background: rgba(196,146,58,0.06);
   padding: 12px; text-align: center; }
-.mf-sym { color: var(--moses-gold); font-size: 22px; font-weight: 800; }
-.mf-form { color: var(--moses-ink); font-size: 11px; font-family: ui-monospace, monospace; margin-top: 2px; }
+.mf-sym { color: var(--moses-dim); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; }
+.mf-big { color: var(--moses-gold); font-size: 32px; font-weight: 800; line-height: 1.05; margin: 4px 0 2px;
+  text-shadow: 0 0 16px rgba(196,146,58,0.3); }
+.mf-form { color: var(--moses-dim); font-size: 9.5px; font-family: ui-monospace, monospace; }
 .mf-tag { color: var(--moses-dim); font-size: 10px; text-transform: uppercase; letter-spacing: 0.04em; margin-top: 4px; }
 @media (max-width: 700px) { .mf-grid { grid-template-columns: 1fr 1fr; } }
 
@@ -261,7 +263,8 @@ button.primary:hover, #compute-btn:hover { background: #d8a449 !important; }
 
 /* ---------- hero status + live counters (top-right) ---------- */
 .hero-stat { text-align: right; font-size: 10px; letter-spacing: 0.06em; line-height: 1.65;
-  font-weight: 700; color: var(--moses-dim); white-space: nowrap; min-width: 196px; }
+  font-weight: 700; color: var(--moses-dim); white-space: nowrap; min-width: 196px;
+  margin-top: 34px; }  /* clear the HF Space pill (burnmydays/sigrank ♡) in embedded view */
 .hs-row { display: flex; justify-content: space-between; gap: 16px; }
 .hs-div { height: 1px; background: var(--moses-line); margin: 5px 0; }
 .hs-burn { color: #ef6b6b; } .hs-build { color: #4ade80; } .hs-tenx { color: var(--moses-gold); }

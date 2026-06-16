@@ -535,20 +535,17 @@ def metric_features_html():
     boxes = []
     for sym, key, form, fmt, desc in _FEATURE_METRICS:
         vals = _corpus_metric_values(key)
-        med = _median(vals); avg = sum(vals) / len(vals) if vals else 0
-        if key == "avg_cost_1m":
-            stat = f"med ${_fmt_cost(med)} · avg ${_fmt_cost(avg)}"
-        else:
-            stat = f"med {fmt.format(v=med)} · avg {fmt.format(v=avg)}"
+        avg = sum(vals) / len(vals) if vals else 0
+        big = f"${_fmt_cost(avg)}" if key == "avg_cost_1m" else fmt.format(v=avg)
         boxes.append(
             f'<div class="mf-box" tabindex="0"><div class="mf-sym">{sym}</div>'
+            f'<div class="mf-big">{big}</div>'
             f'<div class="mf-form">{form}</div>'
-            f'<div class="mf-stat">{stat}</div>'
             f'<div class="mf-tip">{desc}</div></div>')
     return ('<div class="mf-head">Introducing the new standard in '
             '<span>AI metrics &amp; benchmarks</span></div>'
             f'<div class="mf-grid">{"".join(boxes)}</div>'
-            '<div class="mf-sub">hover any metric for what it means · med/avg across the live field</div>')
+            '<div class="mf-sub">field average · hover any metric for what it means</div>')
 
 # ---- real mini renders of each page (live HTML, scaled into a framed thumbnail) ----
 def _top_rows(n):
