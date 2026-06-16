@@ -494,54 +494,58 @@ def metric_features_html():
             '<span>AI metrics &amp; benchmarks</span></div>'
             f'<div class="mf-grid">{boxes}</div>')
 
-# ---- mini live samples for each section box ----
+# ---- real mini renders of each page (live HTML, scaled into a framed thumbnail) ----
 def _top_rows(n):
     return sorted(((k, compute(*v)) for k, v in operators().items()),
                   key=lambda r: r[1]["yield"], reverse=True)[:n]
 
-def _sample_leaders():
-    return "".join(
-        f'<div class="sm-row"><span class="sm-rk">#{i}</span>'
-        f'<span class="sm-nm">{_html.escape(k)}</span>'
-        f'<span class="sm-y">Υ {m["yield"]:,.0f}</span></div>'
-        for i, (k, m) in enumerate(_top_rows(3), 1))
+def _mini(cap, inner, accent):
+    """Frame real page HTML as a browser-chrome thumbnail; CSS scales it down."""
+    return (f'<div class="mini mini-{accent}">'
+            f'<div class="mini-chrome"><span></span><span></span><span></span>'
+            f'<div class="mini-cap">{cap}</div></div>'
+            f'<div class="mini-view"><div class="mini-scale">{inner}</div></div></div>')
 
-def _sample_reports():
+def _mini_leaders():
+    return _mini("sigrank · leaders", board_html(), "gold")
+
+def _mini_reports():
     k, m = _top_rows(1)[0]
-    return (f'<div class="sm-card"><div class="sm-nm">{_html.escape(k)}</div>'
-            f'<div class="sm-kv">Υ {m["yield"]:,.0f} · SNR {m["snr"]:.2f} · '
-            f'{m["leverage"]:,.0f}× lev</div></div>')
+    read = narrate(k, m, classify(m))
+    return _mini("sigrank · reports",
+                 card_html(k, m, 1, len(operators()), read), "purple")
 
-def _sample_vs():
-    (a, ma), (b, mb) = _top_rows(2)
-    return (f'<div class="sm-vs"><span class="sm-nm">{_html.escape(a)}</span>'
-            f'<span class="sm-y">Υ {ma["yield"]:,.0f}</span>'
-            f'<span class="sm-vsx">vs</span>'
-            f'<span class="sm-nm">{_html.escape(b)}</span>'
-            f'<span class="sm-y2">Υ {mb["yield"]:,.0f}</span></div>')
+def _mini_vs():
+    return _mini("sigrank · vs", compare_html([k for k, _ in _top_rows(3)]), "blue")
 
-def _sample_create():
-    return ('<div class="sm-create"><code>1251211 11296121 …</code>'
-            '<span class="sm-arrow">→</span><span class="sm-y">Υ 18,437</span></div>')
+def _mini_create():
+    inner = (
+        '<div class="cr-mock">'
+        '<div class="cr-code">$ ./sigrank --submit</div>'
+        '<div class="cr-box">paste ccusage JSON — or four numbers:<br>'
+        '<b>1251211 11296121 128196310 2555179769</b></div>'
+        '<div class="cr-btn">⬡ Clock My Signal</div>'
+        '<div class="cr-res">Υ 18,437 · CASCADE MATRIX</div></div>')
+    return _mini("sigrank · create", inner, "green")
 
 _HOME_SECTIONS = [
     ("Leaders", "Prove your signal",
-     "The burn-vs-build board — who wins on architecture, not spend.", _sample_leaders),
+     "The burn-vs-build board — who wins on architecture, not spend.", _mini_leaders, "gold"),
     ("Reports", "Study the field",
-     "Pull any operator's full read. R&D — improve yourself.", _sample_reports),
+     "Pull any operator's full read. R&D — improve yourself.", _mini_reports, "purple"),
     ("VS", "Head-to-head",
-     "Who's actually 10×? Who's amplifying signal — and at what cost?", _sample_vs),
+     "Who's actually 10×? Who's amplifying signal — and at what cost?", _mini_vs, "blue"),
     ("Create", "Clock your signal",
-     "Drop your token ledger, get scored, claim your operator card.", _sample_create),
+     "Drop your ledger, get scored, claim your operator card.", _mini_create, "green"),
 ]
 
 def home_html():
     boxes = "".join(
-        f'<div class="hm-box"><div class="hm-title">◢ {t}</div>'
+        f'<div class="hm-box hm-{accent}">{mini()}'
+        f'<div class="hm-title">◢ {t}</div>'
         f'<div class="hm-sub">{s}</div><div class="hm-desc">{d}</div>'
-        f'<div class="hm-sample">{sample()}</div>'
         f'<div class="hm-cta">open the {t} tab →</div></div>'
-        for t, s, d, sample in _HOME_SECTIONS
+        for t, s, d, mini, accent in _HOME_SECTIONS
     )
     return f'<div class="hm-grid">{boxes}</div>'
 
